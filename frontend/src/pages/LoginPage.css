@@ -1,0 +1,38 @@
+.login-wrapper {
+background: linear-gradient(
+    135deg,
+    #B8D8D8,
+    #A8C8C8,
+    #D2E2D8
+);
+    animation: anim 6s ease infinite;
+    background-size: 200%;
+}
+.login-wrapper>form{
+    border: 1px solid #777;
+}
+@keyframes anim {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    20% {
+        background-position: 100% 0%;
+    }
+
+    40% {
+        background-position: 100% 100%;
+    }
+
+    60% {
+        background-position: 0% 100%;
+    }
+
+    80% {
+        background-position: 50% 0%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}

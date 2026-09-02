@@ -1,0 +1,18 @@
+.navbar{
+    background-color: var(--color-surface);
+}
+
+.login{
+    margin-right: 50px;
+}
+.logo{
+    margin-left: 50px;
+}
+
+.categorie:hover{
+    color: var(--color-text-muted);
+}
+
+.login:hover{
+    color: var(--color-text-muted);
+}
