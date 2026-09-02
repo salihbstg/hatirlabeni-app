@@ -1,13 +1,86 @@
-import React from "react";
-
+import React, { useState } from "react";
+import logo from "./../assets/Logo.png";
 import "./RegisterPage.css";
-
+import type { RegisterForm } from "./../types/auth";
 import { cities } from "../data/cities";
+import { register } from "./../services/authService";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+function isValidTCKN(value: string): boolean {
+  if (!/^\d{11}$/.test(value)) return false;
+  if (value[0] === "0") return false;
+
+  const digits = value.split("").map(Number);
+
+  const oddSum = digits[0] + digits[2] + digits[4] + digits[6] + digits[8];
+  const evenSum = digits[1] + digits[3] + digits[5] + digits[7];
+
+  const digit10 = (oddSum * 7 - evenSum) % 10;
+  const digit11 =
+    digits.slice(0, 10).reduce((sum, digit) => sum + digit, 0) % 10;
+
+  return digits[9] === digit10 && digits[10] === digit11;
+}
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<RegisterForm>({
+    username: "",
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    nationalId: "",
+    telephone: "",
+    city: "",
+    address: "",
+    birthday: "",
+  });
   return (
-    <div className="register-wrapper min-h-screen flex items-center justify-center px-4 py-8">
-      <form action="" className="w-full max-w-4xl">
+    <div className="register-wrapper flex flex-col min-h-screen flex items-center justify-center px-4 py-8">
+      <img className="w-40 gap-3" src={logo} alt="yüklenemedi" />
+      <form
+        onSubmit={async (e) => {
+          e.preventDefault();
+          if (!isValidTCKN(formData.nationalId)) {
+            toast.error(
+              "Lütfen T.C. standartlarına uygun bir kimlik numarası giriniz.",
+            );
+            return;
+          }
+          try {
+            const response = await register(formData);
+            console.log(response);
+            toast.success(
+              "Kayıt başarılı, giriş sayfasına yönlendiriliyorsunuz.",
+            );
+            setTimeout(() => {
+              navigate("/login");
+            }, 1500);
+          } catch (e) {
+            const errors = e.response?.data.errors;
+
+            if (axios.isAxiosError(e)) {
+              if (Array.isArray(errors)) {
+                errors.forEach((message: string) => {
+                  toast.error(message);
+                });
+              } else {
+                Object.values(errors).forEach((message) => {
+                  toast.error(message as string);
+                });
+              }
+            }
+            else{
+              toast.error("Beklenmeyen bir hata oluştu.");
+            }
+          }
+        }}
+        action=""
+        className="w-full max-w-4xl"
+      >
         <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl">
           {/* FORM BAŞLIĞI */}
           <div className="mb-8 text-center">
@@ -30,6 +103,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    username: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 id="register-username"
@@ -47,6 +127,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    email: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="email"
                 id="register-email"
@@ -63,6 +150,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    firstName: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 id="register-name"
@@ -79,6 +173,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    lastName: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 id="register-lastname"
@@ -96,6 +197,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    password: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="password"
                 id="register-password"
@@ -118,6 +226,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    nationalId: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 id="register-nationalId"
@@ -137,6 +252,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    birthday: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="date"
                 id="register-birthday"
@@ -154,6 +276,13 @@ const RegisterPage = () => {
               </label>
 
               <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    telephone: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 type="tel"
                 inputMode="tel"
@@ -174,6 +303,13 @@ const RegisterPage = () => {
               </label>
 
               <select
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    city: e.target.value,
+                  });
+                }}
                 className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
                 id="city"
                 name="city"
@@ -198,6 +334,13 @@ const RegisterPage = () => {
               </label>
 
               <textarea
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    address: e.target.value,
+                  });
+                }}
                 className="w-full bg-white text-black p-3 rounded-lg border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 maxLength={250}
                 name="register-address"

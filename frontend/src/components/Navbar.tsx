@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import navbarMenu from "./../assets/NavbarMenuIcon.jpg";
 import logo from "./../assets/Logo.png";
 import {categories} from "./../data/categories";
@@ -40,7 +39,7 @@ const Navbar = () => {
 
           {/* LOGO */}
           <a
-            href="/home"
+            href="/"
             className="flex items-center h-16 shrink-0"
           >
             <img

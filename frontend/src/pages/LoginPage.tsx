@@ -1,5 +1,5 @@
 import React from "react";
-
+import logo from "./../assets/Logo.png"
 import googleIcon from "./../assets/GoogleIcon.png";
 
 import "./LoginPage.css";
@@ -16,8 +16,11 @@ const LoginPage = () => {
         px-4
         py-8
         libre-baskerville
+        flex
+        flex-col
       "
     >
+      <img className="w-40 gap-3" src={logo} alt="yüklenemedi" />
       <div className="w-full max-w-md">
         {/* CARD */}
         <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl">
