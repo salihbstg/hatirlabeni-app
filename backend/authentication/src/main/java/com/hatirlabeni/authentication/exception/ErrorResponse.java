@@ -6,6 +6,6 @@ import java.util.List;
 public record ErrorResponse(
         LocalDateTime timestamp,
         int status,
-        List<String> message
+        List<String> errors
 ) {
 }
