@@ -1,0 +1,42 @@
+  export const categories = {
+    "80'ler": [
+      "Müzik",
+      "Giyim",
+      "Oyuncak",
+      "Teknoloji",
+      "Sinema & TV",
+      "Otomobil",
+    ],
+    "90'lar": [
+      "Müzik",
+      "Giyim",
+      "Oyuncak",
+      "Teknoloji",
+      "Sinema & TV",
+      "Oyun",
+    ],
+    "2000'ler": [
+      "Müzik",
+      "Giyim",
+      "Oyuncak",
+      "Oyun",
+      "Teknoloji",
+      "İnternet",
+    ],
+    "2010'lar": [
+      "Müzik",
+      "Giyim",
+      "Sinema & TV",
+      "Teknoloji",
+      "Sosyal Medya",
+      "Oyun",
+    ],
+    "2020'ler": [
+      "Müzik",
+      "Giyim",
+      "Sinema & TV",
+      "Teknoloji",
+      "Sosyal Medya",
+      "Oyun",
+    ],
+  };

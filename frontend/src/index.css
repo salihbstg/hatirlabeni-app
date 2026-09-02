@@ -1,36 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap");
 @import "tailwindcss";
-#root {
-  min-height: 100vh;
-}
 
-:root {
-  --color-background: #f5f1e8;
-  --color-surface: #ffffff;
-
-  --color-text: #1f1d1a;
-  --color-text-muted: #6b6258;
-
-  --color-border: #d2c8ba;
-
-  /* Typography */
-  --font-body:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-
-  /* Layout */
-  --container-width: 1200px;
-
-  /* Border */
-  --border-radius: 4px;
-}
 body {
-  background-color: var(--color-background);
+  background-color: #E8E3DA ;
+  color: aliceblue;
   color: var(--color-text);
   min-height: 100%;
 }
 .libre-baskerville {
   font-family: "Libre Baskerville", serif;
-}
-.application-container{
-  min-height: 100vh;
 }

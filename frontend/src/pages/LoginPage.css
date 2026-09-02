@@ -1,15 +1,16 @@
 .login-wrapper {
 background: linear-gradient(
-    135deg,
-    #B8D8D8,
-    #A8C8C8,
-    #D2E2D8
+  135deg,
+  #eeeae2 0%,
+  #e8e3da 45%,
+  #ddd7cc 100%
 );
-    animation: anim 6s ease infinite;
+    animation: anim 11s ease infinite;
     background-size: 200%;
+    color: white;
 }
 .login-wrapper>form{
-    border: 1px solid #777;
+    border: 1px solid #fff;
 }
 @keyframes anim {
     0% {

@@ -1,0 +1,14 @@
+.register-wrapper {
+background: linear-gradient(
+  135deg,
+  #eeeae2 0%,
+  #e8e3da 45%,
+  #ddd7cc 100%
+);
+    animation: anim 11s ease infinite;
+    background-size: 200%;
+    color: white;
+}
+input{
+    padding: 2px 7px 2px 7px;
+}
