@@ -1,27 +1,28 @@
-import React, { useState } from "react";
-import navbarMenu from "./../assets/NavbarMenuIcon.jpg";
-import logo from "./../assets/Logo.png";
-import {categories} from "./../data/categories";
+import React, { useState, useContext } from "react";
+import navbarMenu from "./../../assets/NavbarMenuIcon.jpg";
+import logo from "./../../assets/Logo.png";
+import { categories } from "./../../data/Categories";
 import "./Navbar.css";
-
+import { AuthContext } from "../../context/AuthContext";
+import UserMenu from "./UserMenu";
+import { deleteTokens } from "../../utils/Token";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-
-
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const logOut = () => {
+    deleteTokens();
+    setTimeout(() => {
+      setIsAuthenticated(false);
+    }, 300);
+  };
   // Ana kategoriye tıklanınca dropdown aç/kapat
   const handleCategoryClick = (category: string) => {
-    setActiveCategory(
-      activeCategory === category ? null : category
-    );
+    setActiveCategory(activeCategory === category ? null : category);
   };
 
   // Alt kategori seçildiğinde
-  const handleSubcategoryClick = (
-    category: string,
-    subcategory: string
-  ) => {
+  const handleSubcategoryClick = (category: string, subcategory: string) => {
     console.log("Seçilen dönem:", category);
     console.log("Seçilen kategori:", subcategory);
 
@@ -31,17 +32,11 @@ const Navbar = () => {
 
   return (
     <header className="bg-[#F5F1E8] text-[#354545] libre-baskerville border-b border-[#ddd6c8]">
-      
       {/* NAVBAR */}
       <div className="navbar-wrapper w-full max-w-7xl mx-auto px-4 sm:px-6">
-        
         <div className="h-16 flex items-center justify-between">
-
           {/* LOGO */}
-          <a
-            href="/"
-            className="flex items-center h-16 shrink-0"
-          >
+          <a href="/" className="flex items-center h-16 shrink-0">
             <img
               className="h-14 w-auto object-contain"
               src={logo}
@@ -52,12 +47,8 @@ const Navbar = () => {
           {/* DESKTOP MENU */}
           <nav className="hidden md:flex flex-1 justify-center">
             <ul className="flex items-center gap-10 lg:gap-10 font-bold text-sm">
-
               {Object.keys(categories).map((category) => (
-                <li
-                  key={category}
-                  className="relative"
-                >
+                <li key={category} className="relative">
                   <button
                     type="button"
                     onClick={() => handleCategoryClick(category)}
@@ -78,11 +69,7 @@ const Navbar = () => {
                         text-xs
                         transition-transform
                         duration-200
-                        ${
-                          activeCategory === category
-                            ? "rotate-180"
-                            : ""
-                        }
+                        ${activeCategory === category ? "rotate-180" : ""}
                       `}
                     >
                       ▼
@@ -107,19 +94,15 @@ const Navbar = () => {
                         py-2
                       "
                     >
-                      {categories[
-                        category as keyof typeof categories
-                      ].map((subcategory) => (
-                        <button
-                          key={subcategory}
-                          type="button"
-                          onClick={() =>
-                            handleSubcategoryClick(
-                              category,
-                              subcategory
-                            )
-                          }
-                          className="
+                      {categories[category as keyof typeof categories].map(
+                        (subcategory) => (
+                          <button
+                            key={subcategory}
+                            type="button"
+                            onClick={() =>
+                              handleSubcategoryClick(category, subcategory)
+                            }
+                            className="
                             block
                             w-full
                             text-left
@@ -132,22 +115,23 @@ const Navbar = () => {
                             hover:bg-[#e9e3d8]
                             hover:text-stone-600
                           "
-                        >
-                          {subcategory}
-                        </button>
-                      ))}
+                          >
+                            {subcategory}
+                          </button>
+                        ),
+                      )}
                     </div>
                   )}
                 </li>
               ))}
-
             </ul>
           </nav>
 
           {/* LOGIN - DESKTOP */}
-          <div className="hidden md:flex shrink-0">
-            <a
-              className="
+          {!isAuthenticated ? (
+            <div className="hidden md:flex shrink-0">
+              <a
+                className="
                 font-bold
                 text-sm
                 whitespace-nowrap
@@ -155,11 +139,14 @@ const Navbar = () => {
                 duration-200
                 hover:text-stone-500
               "
-              href="/login"
-            >
-              Giriş Yap / Üye Ol
-            </a>
-          </div>
+                href="/login"
+              >
+                Giriş Yap / Üye Ol
+              </a>
+            </div>
+          ) : (
+            <UserMenu></UserMenu>
+          )}
 
           {/* MOBILE MENU BUTTON */}
           <button
@@ -183,11 +170,7 @@ const Navbar = () => {
               hover:bg-[#e9e3d8]
             "
           >
-            <img
-              className="w-8 h-8 object-contain"
-              src={navbarMenu}
-              alt=""
-            />
+            <img className="w-8 h-8 object-contain" src={navbarMenu} alt="" />
           </button>
         </div>
 
@@ -199,24 +182,49 @@ const Navbar = () => {
             transition-all
             duration-300
             ease-in-out
-            ${
-              isOpen
-                ? "max-h-[600px] opacity-100 pb-5"
-                : "max-h-0 opacity-0"
-            }
+            ${isOpen ? "max-h-[600px] opacity-100 pb-5" : "max-h-0 opacity-0"}
           `}
         >
-          <div className="border-t border-[#ddd6c8] pt-4">
-
-            <h3 className="font-bold text-sm mb-2">
-              Kategoriler
-            </h3>
+          <div className="border-[#ddd6c8] pt-4">
+            {/* LOGIN */}
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-2 my-3 gap-3 font-bold">
+                <a
+                  className="hover:opacity-70 transition duration-200"
+                  href="/profile"
+                >
+                  Profil
+                </a>
+                <a
+                  className="hover:opacity-70 transition duration-200"
+                  href="/settings"
+                >
+                  Ayarlar
+                </a>
+              </div>
+            ) : (
+              <a
+                className="
+                block
+                mb-2
+                pt-2
+                border-t
+                border-[#ddd6c8]
+                font-bold
+                text-sm
+                transition-colors
+                duration-200
+                hover:text-stone-500
+              "
+                href="/login"
+              >
+                Giriş Yap / Üye Ol
+              </a>
+            )}
 
             <ul className="flex flex-col gap-1">
-
               {Object.keys(categories).map((category) => (
                 <li key={category}>
-
                   {/* CATEGORY BUTTON */}
                   <button
                     type="button"
@@ -241,11 +249,7 @@ const Navbar = () => {
                         text-xs
                         transition-transform
                         duration-200
-                        ${
-                          activeCategory === category
-                            ? "rotate-180"
-                            : ""
-                        }
+                        ${activeCategory === category ? "rotate-180" : ""}
                       `}
                     >
                       ▼
@@ -267,20 +271,15 @@ const Navbar = () => {
                     `}
                   >
                     <div className="ml-4 mb-2 border-l border-[#d8d0c2]">
-
-                      {categories[
-                        category as keyof typeof categories
-                      ].map((subcategory) => (
-                        <button
-                          key={subcategory}
-                          type="button"
-                          onClick={() =>
-                            handleSubcategoryClick(
-                              category,
-                              subcategory
-                            )
-                          }
-                          className="
+                      {categories[category as keyof typeof categories].map(
+                        (subcategory) => (
+                          <button
+                            key={subcategory}
+                            type="button"
+                            onClick={() =>
+                              handleSubcategoryClick(category, subcategory)
+                            }
+                            className="
                             block
                             w-full
                             text-left
@@ -292,41 +291,19 @@ const Navbar = () => {
                             duration-200
                             hover:text-stone-900
                           "
-                        >
-                          {subcategory}
-                        </button>
-                      ))}
-
+                          >
+                            {subcategory}
+                          </button>
+                        ),
+                      )}
                     </div>
                   </div>
-
                 </li>
               ))}
-
             </ul>
-
-            {/* LOGIN */}
-            <a
-              className="
-                block
-                mt-4
-                pt-4
-                border-t
-                border-[#ddd6c8]
-                font-bold
-                text-sm
-                transition-colors
-                duration-200
-                hover:text-stone-500
-              "
-              href="/login"
-            >
-              Giriş Yap / Üye Ol
-            </a>
-
+            {isAuthenticated?<button onClick={logOut} className="w-full mt-2 border p-1 rounded font-bold">Oturumu Kapat</button>:null}
           </div>
         </div>
-
       </div>
     </header>
   );

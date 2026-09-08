@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import logo from "./../assets/Logo.png";
 import "./RegisterPage.css";
-import type { RegisterForm } from "./../types/auth";
-import { cities } from "../data/cities";
-import { register } from "./../services/authService";
+import type { RegisterForm } from "../types/Auth";
+import { cities } from "../data/Cities";
+import { register } from "./../api/AuthService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
 function isValidTCKN(value: string): boolean {
   if (!/^\d{11}$/.test(value)) return false;
   if (value[0] === "0") return false;
@@ -72,8 +71,7 @@ const RegisterPage = () => {
                   toast.error(message as string);
                 });
               }
-            }
-            else{
+            } else {
               toast.error("Beklenmeyen bir hata oluştu.");
             }
           }
@@ -81,7 +79,7 @@ const RegisterPage = () => {
         action=""
         className="w-full max-w-4xl"
       >
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl">
+        <div className="bg-[#000BA6] border border-slate-700 rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl">
           {/* FORM BAŞLIĞI */}
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white">Hesap Oluştur</h1>
@@ -215,7 +213,29 @@ const RegisterPage = () => {
                 bir özel karakter içermelidir.
               </small>
             </div>
+            {/* ŞİFRE YENİDEN */}
+ <div className="flex flex-col w-full">
+              <label
+                className="font-semibold text-slate-200 mb-1"
+                htmlFor="register-password"
+              >
+                Şifreyi tekrar giriniz
+              </label>
 
+              <input
+                required
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    password: e.target.value,
+                  });
+                }}
+                className="w-full rounded-lg px-3 py-2 bg-white text-black border border-slate-300 outline-none focus:ring-2 focus:ring-blue-500"
+                type="password"
+                id="register-password"
+                name="register-password"
+              />
+            </div>
             {/* TC */}
             <div className="flex flex-col w-full">
               <label
@@ -355,7 +375,7 @@ const RegisterPage = () => {
           <div className="mt-8">
             <button
               type="submit"
-              className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 px-6 transition duration-200"
+              className="w-full rounded-lg bg-white text-black active:bg-blue-800 font-semibold py-3 px-6 transition"
             >
               Kayıt Ol
             </button>

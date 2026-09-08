@@ -1,10 +1,56 @@
-import React from "react";
-import logo from "./../assets/Logo.png"
+import React, { useState, useContext } from "react";
+import logo from "./../assets/Logo.png";
 import googleIcon from "./../assets/GoogleIcon.png";
-
 import "./LoginPage.css";
-
+import type { LoginRequest } from "../types/Auth";
+import { login } from "./../api/AuthService";
+import { saveTokens } from "../utils/Token";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 const LoginPage = () => {
+  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await login(formData);
+
+      saveTokens(response.accessToken, response.refreshToken);
+
+      toast.success("Giriş başarılı, anasayfaya yönlendiriliyorsunuz.");
+      setIsAuthenticated(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          toast.error("Giriş bilgileri hatalı.");
+        } else if (error.response?.status && error.response.status >= 500) {
+          toast.error(
+            "Sunucuda bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
+          );
+        } else {
+          toast.error("Beklenmeyen bir hata oluştu.");
+        }
+      } else {
+        toast.error("Beklenmeyen bir hata oluştu.");
+      }
+    }
+  };
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const [formData, setFormData] = useState<LoginRequest>({
+    identifier: "",
+    password: "",
+  });
   return (
     <div
       className="
@@ -23,8 +69,7 @@ const LoginPage = () => {
       <img className="w-40 gap-3" src={logo} alt="yüklenemedi" />
       <div className="w-full max-w-md">
         {/* CARD */}
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl">
-
+        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-xl">
           {/* BAŞLIK */}
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
@@ -60,12 +105,7 @@ const LoginPage = () => {
               active:bg-slate-200
             "
           >
-            <img
-              className="w-5 h-5"
-              src={googleIcon}
-              alt="Google"
-            />
-
+            <img className="w-5 h-5" src={googleIcon} alt="Google" />
             Google ile giriş yap
           </button>
 
@@ -73,18 +113,13 @@ const LoginPage = () => {
           <div className="flex items-center gap-3 my-6">
             <div className="h-px bg-slate-700 flex-1" />
 
-            <span className="text-xs text-slate-500">
-              veya
-            </span>
+            <span className="text-xs text-slate-500">veya</span>
 
             <div className="h-px bg-slate-700 flex-1" />
           </div>
 
           {/* FORM */}
-          <form
-            action=""
-            className="flex flex-col gap-5"
-          >
+          <form onSubmit={onSubmit} action="" className="flex flex-col gap-5">
             {/* IDENTIFIER */}
             <div className="flex flex-col gap-1.5">
               <label
@@ -95,6 +130,8 @@ const LoginPage = () => {
               </label>
 
               <input
+                required
+                onChange={handleChange}
                 className="
                   w-full
                   min-h-11
@@ -127,6 +164,8 @@ const LoginPage = () => {
               </label>
 
               <input
+                required
+                onChange={handleChange}
                 className="
                   w-full
                   min-h-11
@@ -200,9 +239,7 @@ const LoginPage = () => {
               text-sm
             "
           >
-            <p className="text-slate-400">
-              Hesabın yok mu?
-            </p>
+            <p className="text-slate-400">Hesabın yok mu?</p>
 
             <a
               className="
