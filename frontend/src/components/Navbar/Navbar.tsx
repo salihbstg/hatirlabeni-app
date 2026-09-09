@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import navbarMenu from "./../../assets/Navbar/NavbarMenuIcon.jpg";
 import avatar from "./../../assets/Navbar/Avatar.png";
 import email from "./../../assets/Navbar/email.png";
-import logout from "./../../assets/Navbar/logout.png";
+import cart from "./../../assets/Navbar/shopping-cart.png"
 import OrdersMe from "./../../assets/Navbar/OrdersMe.png";
 import setting from "./../../assets/Navbar/setting.png";
 import logo from "./../../assets/Logo.png";
@@ -209,6 +209,12 @@ const Navbar = () => {
                   className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
                   href="/orders/me"
                 >
+                  <img className="w-4" src={cart} alt="" /><span>Sepet</span>
+                </a>
+                <a
+                  className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
+                  href="/orders/me"
+                >
                   <img className="w-4" src={OrdersMe} alt="" /><span>Tüm siparişlerim</span>
                 </a>
                 <a
@@ -222,7 +228,7 @@ const Navbar = () => {
                   className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
                   href="/messages/me"
                 >
-                  <img className="w-4" src={setting} alt="" /><span>Mesajlarım</span>
+                  <img className="w-4" src={email} alt="" /><span>Mesajlarım</span>
                 </a>
                 
               </div>
