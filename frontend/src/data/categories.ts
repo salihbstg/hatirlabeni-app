@@ -1,5 +1,5 @@
   export const categories = {
-    "80's Child": [
+    "80'ler": [
       "Müzik",
       "Giyim",
       "Oyuncak",

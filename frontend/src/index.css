@@ -1,12 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400..700;1,400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
 body {
-  background-color: #E8E3DA ;
+  background-color: #e8e3da;
   color: aliceblue;
   color: var(--color-text);
   min-height: 100%;
 }
 .libre-baskerville {
   font-family: "Libre Baskerville", serif;
+}
+.navbar{
+  font-family: "Inter", sans-serif;
 }

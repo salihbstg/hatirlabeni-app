@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import logo from "./../assets/Logo.png";
-import googleIcon from "./../assets/GoogleIcon.png";
+import googleIcon from "./../assets/Login-Register/GoogleIcon.png";
 import "./LoginPage.css";
 import type { LoginRequest } from "../types/Auth";
 import { login } from "./../api/AuthService";

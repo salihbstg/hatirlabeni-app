@@ -1,5 +1,10 @@
 import React, { useState, useContext } from "react";
-import navbarMenu from "./../../assets/NavbarMenuIcon.jpg";
+import navbarMenu from "./../../assets/Navbar/NavbarMenuIcon.jpg";
+import avatar from "./../../assets/Navbar/Avatar.png";
+import email from "./../../assets/Navbar/email.png";
+import logout from "./../../assets/Navbar/logout.png";
+import OrdersMe from "./../../assets/Navbar/OrdersMe.png";
+import setting from "./../../assets/Navbar/setting.png";
 import logo from "./../../assets/Logo.png";
 import { categories } from "./../../data/Categories";
 import "./Navbar.css";
@@ -31,7 +36,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="bg-[#F5F1E8] text-[#354545] libre-baskerville border-b border-[#ddd6c8]">
+    <header className="bg-[#F5F1E8] text-[#354545] navbar border-b border-[#ddd6c8]">
       {/* NAVBAR */}
       <div className="navbar-wrapper w-full max-w-7xl mx-auto px-4 sm:px-6">
         <div className="h-16 flex items-center justify-between">
@@ -45,8 +50,10 @@ const Navbar = () => {
           </a>
 
           {/* DESKTOP MENU */}
-          <nav className="hidden md:flex flex-1 justify-center">
-            <ul className="flex items-center gap-10 lg:gap-10 font-bold text-sm">
+          <nav
+            className="hidden md:flex flex-1 justify-center"
+          >
+            <ul className="flex items-center gap-10 lg:gap-10 text-sm">
               {Object.keys(categories).map((category) => (
                 <li key={category} className="relative">
                   <button
@@ -57,9 +64,10 @@ const Navbar = () => {
                       items-center
                       gap-1
                       py-5
-                      transition-colors
+                      transition-all
                       duration-200
                       hover:text-stone-500
+                      
                     "
                   >
                     {category}
@@ -85,13 +93,14 @@ const Navbar = () => {
                         left-1/2
                         -translate-x-1/2
                         z-50
-                        min-w-[180px]
+                        min-w-[400px]
                         bg-[#F5F1E8]
                         border
                         border-[#d8d0c2]
                         rounded-lg
                         shadow-lg
-                        py-2
+                        py-2  
+                        
                       "
                     >
                       {categories[category as keyof typeof categories].map(
@@ -109,10 +118,11 @@ const Navbar = () => {
                             px-5
                             py-2.5
                             text-sm
-                            font-semibold
                             transition-colors
                             duration-200
-                            hover:bg-[#e9e3d8]
+                            hover:bg-[#ccc]
+                            transition
+                            duration-200
                             hover:text-stone-600
                           "
                           >
@@ -182,25 +192,39 @@ const Navbar = () => {
             transition-all
             duration-300
             ease-in-out
-            ${isOpen ? "max-h-[600px] opacity-100 pb-5" : "max-h-0 opacity-0"}
+            ${isOpen ? "opacity-100 pb-5" : "max-h-0 opacity-0"}
           `}
         >
           <div className="border-[#ddd6c8] pt-4">
             {/* LOGIN */}
             {isAuthenticated ? (
-              <div className="flex flex-col gap-2 my-3 gap-3 font-bold">
+              <div className="flex flex-col my-3 gap-4 border-b rounded-4xl mb-6 pb-4 px-5 text-sm">
                 <a
-                  className="hover:opacity-70 transition duration-200"
+                  className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
                   href="/profile"
                 >
-                  Profil
+                  <img className="w-4" src={avatar} alt="" /><span>Hesabım</span>
                 </a>
                 <a
-                  className="hover:opacity-70 transition duration-200"
+                  className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
+                  href="/orders/me"
+                >
+                  <img className="w-4" src={OrdersMe} alt="" /><span>Tüm siparişlerim</span>
+                </a>
+                <a
+                  className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
                   href="/settings"
                 >
-                  Ayarlar
+                  <img className="w-4" src={setting} alt="" /><span>Ayarlar</span>
                 </a>
+
+                <a
+                  className="hover:opacity-70 transition duration-200 flex gap-2 items-center"
+                  href="/messages/me"
+                >
+                  <img className="w-4" src={setting} alt="" /><span>Mesajlarım</span>
+                </a>
+                
               </div>
             ) : (
               <a
@@ -210,7 +234,6 @@ const Navbar = () => {
                 pt-2
                 border-t
                 border-[#ddd6c8]
-                font-bold
                 text-sm
                 transition-colors
                 duration-200
@@ -222,7 +245,7 @@ const Navbar = () => {
               </a>
             )}
 
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-2 my-2 px-5">
               {Object.keys(categories).map((category) => (
                 <li key={category}>
                   {/* CATEGORY BUTTON */}
@@ -235,7 +258,6 @@ const Navbar = () => {
                       items-center
                       justify-between
                       py-2
-                      font-bold
                       text-sm
                       transition-colors
                       duration-200
@@ -301,7 +323,14 @@ const Navbar = () => {
                 </li>
               ))}
             </ul>
-            {isAuthenticated?<button onClick={logOut} className="w-full mt-2 border p-1 rounded font-bold">Oturumu Kapat</button>:null}
+            {isAuthenticated ? (
+              <button
+                onClick={logOut}
+                className="w-full mt-2 border p-1 rounded"
+              >
+                Oturumu Kapat
+              </button>
+            ) : null}
           </div>
         </div>
       </div>
