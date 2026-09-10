@@ -57,7 +57,7 @@ const CategoryMenuDesktop = () => {
                     className={`absolute left-0 bottom-0 h-[2px] w-full origin-center rounded-full bg-[#A45F2A] transition-transform duration-300 ease-out ${
                       selectedEra === era
                         ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-75"
+                        : "scale-x-0 "
                     }`}
                   />
                 </span>
