@@ -4,13 +4,12 @@
 
 body {
   background-color: #e8e3da;
-  color: aliceblue;
-  color: var(--color-text);
+  color: black;
   min-height: 100%;
 }
 .libre-baskerville {
   font-family: "Libre Baskerville", serif;
 }
-.navbar{
+.navbar-font{
   font-family: "Inter", sans-serif;
 }
