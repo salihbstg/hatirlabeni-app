@@ -33,3 +33,30 @@ export type RegisterResponse = {
     updatedAt: string;
   };
 };
+
+type User = {
+  id: number;
+  uuid: string;
+  firstName: string;
+  lastName: string;
+  nationalId: string;
+  telephone: string;
+  city: string;
+  address: string;
+  birthday: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type Auth = {
+  uuid: string;
+  username: string;
+  email: string;
+  role: "USER" | "ADMIN";
+};
+
+export type MeResponse = {
+  user: User;
+  auth: Auth;
+};

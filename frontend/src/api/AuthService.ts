@@ -7,7 +7,12 @@ export const register = async (formData: RegisterForm) => {
   return response.data;
 };
 
-export const login = async (formData:LoginRequest)=>{
-  const response = await api.post<LoginRequest>("/auth/login",formData);
+export const login = async (formData: LoginRequest) => {
+  const response = await api.post<LoginRequest>("/auth/login", formData);
   return response.data;
-}
+};
+
+export const me = async () => {
+  const response = await api.get("/users/me");
+  return response.data;
+};

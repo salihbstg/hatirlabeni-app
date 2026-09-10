@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProfileCard = (props) => {
+const ProfileMenuCard = (props) => {
   return (
     <button
       onClick={props.onClick}
@@ -38,4 +38,4 @@ const ProfileCard = (props) => {
   );
 };
 
-export default ProfileCard;
+export default ProfileMenuCard;
