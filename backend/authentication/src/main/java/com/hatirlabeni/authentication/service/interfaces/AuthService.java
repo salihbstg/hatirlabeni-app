@@ -13,7 +13,7 @@ public interface AuthService {
 
     AuthUserResponse getByUsername(String username);
 
-    LoginResponse refresh(RefreshTokenRequest refreshTokenRequest);
+    LoginResponse refresh(String token);
 
     void deleteAuthUser(UUID uuid);
 

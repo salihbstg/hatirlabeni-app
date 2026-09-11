@@ -119,9 +119,10 @@ public class AuthController {
     })
     @PostMapping("/refresh")
     ResponseEntity<LoginResponse> refresh(
-            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest
+            @RequestHeader("Authorization") String authHeader
     ) {
-        return ResponseEntity.ok(authService.refresh(refreshTokenRequest));
+        String token=authHeader.substring(7);
+        return ResponseEntity.ok(authService.refresh(token));
     }
 
     @Operation(

@@ -159,13 +159,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse refresh(RefreshTokenRequest refreshTokenRequest) {
-        String refreshToken = refreshTokenRequest.refreshToken();
-        String tokenType = jwtService.extractTokenType(refreshToken);
+    public LoginResponse refresh(String token) {
+        String tokenType = jwtService.extractTokenType(token);
         if (!"refresh".equals(tokenType)) {
             throw new InvalidTokenException("Invalid refresh token");
         }
-        String username = jwtService.extractUsername(refreshToken);
+        String username = jwtService.extractUsername(token);
         AuthUser authUser = authUserRepository.findByUsername(username)
                 .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
 

@@ -127,6 +127,15 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(AddressNotFoundException.class)
+    ResponseEntity<CustomErrorResponse> addressNotFoundException(AddressNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorResponse(
+           LocalDateTime.now(),
+           HttpStatus.NOT_FOUND.value(),
+           List.of(e.getMessage())
+        ));
+    }
+
     @ExceptionHandler(AdminStatusChangeNotAllowedException.class)
     ResponseEntity<CustomErrorResponse> adminIsImmutableException(AdminStatusChangeNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new CustomErrorResponse(
