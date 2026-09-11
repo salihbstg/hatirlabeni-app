@@ -9,8 +9,6 @@ public record CreateUserRequest(
         String lastName,
         String nationalId,
         String telephone,
-        String city,
-        String address,
         LocalDate birthday
 ) {
 }

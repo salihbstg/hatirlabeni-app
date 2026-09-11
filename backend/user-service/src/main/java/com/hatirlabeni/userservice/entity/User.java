@@ -33,12 +33,6 @@ public class User {
     private String telephone;
 
     @Column(nullable = false)
-    private String city;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
     private LocalDate birthday;
 
     @Column(nullable = false)

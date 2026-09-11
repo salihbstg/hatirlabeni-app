@@ -95,8 +95,6 @@ public class AuthServiceImpl implements AuthService {
                 registerRequest.lastName(),
                 registerRequest.nationalId(),
                 registerRequest.telephone(),
-                registerRequest.city(),
-                registerRequest.address(),
                 registerRequest.birthday()
         );
     }

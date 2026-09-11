@@ -30,14 +30,6 @@ public record UpdateUserRequest(
         )
         String telephone,
 
-        @Pattern(
-                regexp = "^[a-zA-ZçÇğĞıİöÖşŞüÜ\\s]+$",
-                message = "Şehir yalnızca harflerden oluşmalıdır."
-        )
-        String city,
-
-        String address,
-
         LocalDate birthday
 ) {
 }

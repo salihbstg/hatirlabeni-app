@@ -11,8 +11,6 @@ public record CreateUserRequest(
         @NotNull String lastName,
         @NotNull String nationalId,
         @NotNull String telephone,
-        @NotNull String city,
-        @NotNull String address,
         @NotNull LocalDate birthday
 ) {
 }

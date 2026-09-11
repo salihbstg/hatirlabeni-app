@@ -46,14 +46,6 @@ public record RegisterRequest
                 )
                 String telephone,
 
-                @NotBlank(message = "Şehir boş olamaz.")
-                @Size(max = 50, message = "Şehir en fazla 50 karakter olabilir.")
-                String city,
-
-                @NotBlank(message = "Adres boş olamaz.")
-                @Size(max = 250, message = "Adres en fazla 250 karakter olabilir.")
-                String address,
-
                 @NotNull(message = "Doğum tarihi boş olamaz.")
                 @Past(message = "Doğum tarihi geçmiş bir tarih olmalıdır.")
                 LocalDate birthday

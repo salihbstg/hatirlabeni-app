@@ -12,7 +12,6 @@ public record UserResponse(
         String nationalId,
         String telephone,
         String city,
-        String address,
         LocalDate birthday,
         Boolean active,
         LocalDateTime createdAt,

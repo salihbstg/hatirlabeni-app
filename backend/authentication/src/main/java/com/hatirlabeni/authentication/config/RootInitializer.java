@@ -48,8 +48,6 @@ public class RootInitializer implements CommandLineRunner {
                 "Hatırlabeni",
                 "10000000000",
                 "05000000000",
-                "Root",
-                "Hatırlabeni Root",
                 LocalDate.of(2026, 1, 1)
         );
         createUserWithRetry(createUserRequest);
