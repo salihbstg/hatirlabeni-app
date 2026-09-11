@@ -1,5 +1,4 @@
-import type { LoginRequest, RegisterForm } from "../types/Auth";
-import type { RegisterResponse } from "../types/Auth";
+import type { LoginRequest, RegisterForm,RegisterResponse } from "../types/Auth";
 import api from "./axios";
 
 export const register = async (formData: RegisterForm) => {

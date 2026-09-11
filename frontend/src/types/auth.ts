@@ -6,8 +6,6 @@ export type RegisterForm = {
   lastName: string;
   nationalId: string;
   telephone: string;
-  city: string;
-  address: string;
   birthday: string;
 };
 
@@ -25,8 +23,6 @@ export type RegisterResponse = {
     lastName: string;
     nationalId: string;
     telephone: string;
-    city: string;
-    address: string;
     birthday: string;
     active: boolean;
     createdAt: string;
@@ -41,8 +37,6 @@ type User = {
   lastName: string;
   nationalId: string;
   telephone: string;
-  city: string;
-  address: string;
   birthday: string;
   active: boolean;
   createdAt: string;
@@ -60,3 +54,4 @@ export type MeResponse = {
   user: User;
   auth: Auth;
 };
+
