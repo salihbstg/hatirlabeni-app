@@ -2,21 +2,32 @@ package com.hatirlabeni.authentication.service.impl;
 
 import com.hatirlabeni.authentication.dtos.*;
 import com.hatirlabeni.authentication.entity.AuthUser;
+import com.hatirlabeni.authentication.entity.PasswordResetToken;
 import com.hatirlabeni.authentication.enums.Role;
 import com.hatirlabeni.authentication.exception.*;
 import com.hatirlabeni.authentication.feign.UserServiceFeign;
 import com.hatirlabeni.authentication.repository.AuthUserRepository;
+import com.hatirlabeni.authentication.repository.PasswordResetTokenRepository;
 import com.hatirlabeni.authentication.security.JwtService;
+import com.hatirlabeni.authentication.security.SecurityConfig;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,11 +35,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final SecurityConfig securityConfig;
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
+
     private final AuthUserRepository authUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserServiceFeign userServiceFeign;
     private final ObjectMapper objectMapper;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final MailService mailService;
+
 
     private UserResponse createUserOnUserService(CreateUserRequest request) {
         try {
@@ -99,12 +117,35 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    private void userIsActive(String token, UUID uuid){
-        if(!userServiceFeign.isActive(
-                "Bearer "+token,
+    private void userIsActive(String token, UUID uuid) {
+        if (!userServiceFeign.isActive(
+                "Bearer " + token,
                 uuid
-        )){
+        )) {
             throw new UserNotActiveException();
+        }
+    }
+
+    private String generateResetToken() {
+        SecureRandom secureRandom = new SecureRandom();
+
+        byte[] bytes = new byte[32];
+        secureRandom.nextBytes(bytes);
+
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(bytes);
+    }
+
+    private String hashResetPasswordToken(String token) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -171,7 +212,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateToken(authUser);
         String newRefreshToken = jwtService.generateRefreshToken(authUser);
 
-        userIsActive(accessToken,authUser.getUuid());
+        userIsActive(accessToken, authUser.getUuid());
 
         return new LoginResponse(
                 accessToken,
@@ -225,4 +266,38 @@ public class AuthServiceImpl implements AuthService {
         authUserRepository.save(user);
     }
 
+    @Override
+    public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
+        AuthUser user = authUserRepository.findByUsernameOrEmail(
+                        forgotPasswordRequest.identifier(),
+                        forgotPasswordRequest.identifier())
+                .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı"));
+        String token = generateResetToken();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setUserUUID(user.getUuid());
+        passwordResetToken.setTokenHash(hashResetPasswordToken(token));
+        passwordResetTokenRepository.save(passwordResetToken);
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        mailService.sendSimpleMail(user.getEmail(), "Şifre Sıfırlama", "Şifrenizi sıfırlamak için aşağıdaki bağlantıyı kullanın.\n\n" + resetLink);
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByTokenHash(hashResetPasswordToken(resetPasswordRequest.token())).orElseThrow(() ->
+                new InvalidPasswordResetTokenException("Geçersiz veya bulunamayan şifre sıfırlama tokenı")
+        );
+        if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new ExpiredPasswordResetTokenException("Şifre sıfırlama bağlantısının süresi dolmuş. Lütfen işlemi yeniden başlatınız.");
+        }
+        if (passwordResetToken.getUsedAt() != null) {
+            throw new InvalidPasswordResetTokenException("Bu şifre sıfırlama bağlantısı daha önce kullanılmış.");
+        }
+        AuthUser authUser=authUserRepository.findByUuid(passwordResetToken.getUserUUID()).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
+        authUser.setPassword(passwordEncoder.encode(resetPasswordRequest.newPassword()));
+        authUserRepository.save(authUser);
+        passwordResetToken.setUsedAt(LocalDateTime.now());
+        passwordResetTokenRepository.save(passwordResetToken);
+    }
 }

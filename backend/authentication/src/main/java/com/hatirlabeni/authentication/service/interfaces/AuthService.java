@@ -1,6 +1,7 @@
 package com.hatirlabeni.authentication.service.interfaces;
 
 import com.hatirlabeni.authentication.dtos.*;
+import jakarta.validation.Valid;
 
 import java.util.UUID;
 
@@ -22,4 +23,8 @@ public interface AuthService {
     void makeAdmin(UUID uuid);
 
     void makeUser(UUID uuid);
+
+    void forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
+
+    void resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

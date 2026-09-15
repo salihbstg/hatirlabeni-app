@@ -1,5 +1,6 @@
 package com.hatirlabeni.authentication.exception;
 
+import org.springframework.cglib.core.Local;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,7 +116,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyAdminException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyAdminException(
             AlreadyAdminException ex
-    ){
+    ) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
@@ -126,7 +127,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyUserException.class)
     public ResponseEntity<ErrorResponse> handleAlreadyUserException(
             AlreadyUserException ex
-    ){
+    ) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
@@ -137,7 +138,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RootIsImmutableException.class)
     public ResponseEntity<ErrorResponse> handleRootIsImmutableException(
             RootIsImmutableException ex
-    ){
+    ) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
@@ -148,12 +149,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotActiveException.class)
     public ResponseEntity<ErrorResponse> handleUserNotActiveException(
             UserNotActiveException ex
-    ){
+    ) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
                 List.of(ex.getMessage())
         ));
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPasswordResetTokenException(
+            InvalidPasswordResetTokenException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        List.of(ex.getMessage())
+                )
+        );
+    }
+
+    @ExceptionHandler(ExpiredPasswordResetTokenException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredPasswordResetTokenException(
+            ExpiredPasswordResetTokenException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        List.of(ex.getMessage())
+                )
+        );
     }
 
     @ExceptionHandler(Exception.class)
@@ -166,7 +193,6 @@ public class GlobalExceptionHandler {
                         List.of("Beklenmeyen bir hata oluştu.")
                 ));
     }
-
 
 
 }

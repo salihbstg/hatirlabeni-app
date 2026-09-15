@@ -158,4 +158,16 @@ public class AuthController {
     ) {
         return ResponseEntity.ok(authService.getByUuid(uuid));
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest){
+        authService.forgotPassword(forgotPasswordRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest){
+        authService.resetPassword(resetPasswordRequest);
+        return ResponseEntity.noContent().build();
+    }
 }
