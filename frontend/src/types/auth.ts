@@ -55,3 +55,11 @@ export type MeResponse = {
   auth: Auth;
 };
 
+export type ForgotPasswordRequest = {
+  identifier: String;
+};
+
+export type ResetPasswordRequest = {
+  token: String;
+  newPassword: String;
+};

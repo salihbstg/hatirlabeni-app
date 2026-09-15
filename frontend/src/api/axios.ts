@@ -40,7 +40,6 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem("refreshToken");
 
-      console.log("Refresh token var mı:", !!refreshToken);
 
       if (!refreshToken) {
         localStorage.removeItem("accessToken");
@@ -52,7 +51,6 @@ api.interceptors.response.use(
       }
 
       try {
-        console.log("Refresh isteği gönderiliyor...");
 
         const response = await axios.post(
           "http://localhost:8080/api/v1/auth/refresh",
@@ -64,39 +62,26 @@ api.interceptors.response.use(
           }
         );
 
-        console.log("Refresh başarılı:", response.status);
 
         const newAccessToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
 
-        console.log(
-          "ESKİ TOKEN:",
-          localStorage.getItem("accessToken")
-        );
 
-        console.log("YENİ TOKEN:", newAccessToken);
+
 
         saveTokens(newAccessToken, newRefreshToken);
 
-        console.log(
-          "LOCALSTORAGE TOKEN:",
-          localStorage.getItem("accessToken")
-        );
+ 
 
         originalRequest.headers.Authorization =
           `Bearer ${newAccessToken}`;
 
-        console.log("Orijinal istek tekrar gönderiliyor...");
+     
 
-        console.log("RETRY REQUEST:", {
-          url: originalRequest.url,
-          method: originalRequest.method,
-          headers: originalRequest.headers,
-        });
+     
 
         return api(originalRequest);
       } catch (refreshError) {
-        console.log("REFRESH BAŞARISIZ:", refreshError);
 
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");

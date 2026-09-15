@@ -177,7 +177,7 @@ const LoginPage = () => {
                 <div className="-mt-2 flex justify-end">
                   <a
                     className="text-xs font-medium text-[#5C7D75] transition-colors hover:text-[#3F5B55] sm:text-sm"
-                    href="#"
+                    href="/forgot-password"
                   >
                     Şifremi unuttum
                   </a>
