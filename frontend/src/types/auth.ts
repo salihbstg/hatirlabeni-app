@@ -55,6 +55,11 @@ export type MeResponse = {
   auth: Auth;
 };
 
+export type LoginRequest={
+  identifier:string,
+  password:string
+}
+
 export type ForgotPasswordRequest = {
   identifier: String;
 };

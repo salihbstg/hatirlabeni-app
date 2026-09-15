@@ -33,8 +33,10 @@ api.interceptors.response.use(
     });
 
     if (
-      error.response?.status === 401 &&
-      !originalRequest._retry
+       error.response?.status === 401 &&
+  !originalRequest._retry &&
+  originalRequest.url !== "/auth/login" &&
+  originalRequest.url !== "/auth/refresh"
     ) {
       originalRequest._retry = true;
 

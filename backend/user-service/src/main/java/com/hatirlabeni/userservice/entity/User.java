@@ -38,6 +38,8 @@ public class User {
     @Column(nullable = false)
     private boolean active;
 
+    private boolean mailActivation;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -48,6 +50,7 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.mailActivation=false;
         this.active=true;
     }
 

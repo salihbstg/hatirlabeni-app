@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -157,6 +158,21 @@ public class UserServiceImpl implements UserService {
     public Boolean isActive(UUID uuid) {
         User user = findUser(uuid);
         return user.isActive();
+    }
+
+    @Override
+    public void createRoot(CreateUserRequest createUserRequest) {
+        Optional<User> optionalUser = userRepository.findByNationalId(createUserRequest.nationalId());
+        if (optionalUser.isEmpty()) {
+            createUser(createUserRequest);
+        }
+    }
+
+    @Override
+    public void mailActivation(UUID uuid) {
+        User user = userRepository.findByUuid(uuid).orElseThrow(UserNotFoundException::new);
+        user.setMailActivation(true);
+        userRepository.save(user);
     }
 
     @Override

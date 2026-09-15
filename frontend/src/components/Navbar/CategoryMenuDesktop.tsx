@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { categories } from "../../data/Categories";
+import { categories } from "../../data/categories";
 
 const CategoryMenuDesktop = () => {
   const [selectedEra, setSelectedEra] = useState<string | null>(null);

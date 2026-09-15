@@ -5,7 +5,7 @@ import googleIcon from "./../assets/Login-Register/GoogleIcon.png";
 
 import "./LoginPage.css";
 
-import type { LoginRequest } from "../types/Auth";
+import type { LoginRequest } from "../types/auth";
 
 import { login } from "./../api/AuthService";
 import { saveTokens } from "../utils/Token";
@@ -19,7 +19,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
 const LoginPage = () => {
-  const { setIsAuthenticated } = useContext(AuthContext);
+  const { setIsAuthenticated } = useContext<any>(AuthContext);
 
   const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ const LoginPage = () => {
     password: "",
   });
 
-  const onSubmit = async (e) => {
+  const onSubmit = async (e:React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -65,7 +65,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e:any) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,

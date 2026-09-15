@@ -15,6 +15,7 @@ public record UserResponse(
         LocalDate birthday,
         Boolean active,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        boolean mailActivation
 ) {
 }

@@ -21,4 +21,8 @@ public interface UserService {
     UserProfileResponse getUserByEmail(String email);
 
     Boolean isActive(UUID uuid);
+
+    void createRoot(CreateUserRequest createUserRequest);
+
+    void mailActivation(UUID uuid);
 }

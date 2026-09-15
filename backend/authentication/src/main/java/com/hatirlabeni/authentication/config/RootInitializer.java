@@ -56,21 +56,45 @@ public class RootInitializer implements CommandLineRunner {
 
     private void createUserWithRetry(CreateUserRequest createUserRequest) {
         int maxAttempts = 5;
-        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                userServiceFeign.createUser(createUserRequest);
+                System.out.println(
+                        "User Service'e kullanıcı oluşturma isteği gönderiliyor... " +
+                                "Deneme: " + attempt + "/" + maxAttempts
+                );
+
+                userServiceFeign.createRoot(createUserRequest);
+
+                System.out.println("User Service'e kullanıcı başarıyla oluşturuldu.");
                 return;
+
             } catch (Exception e) {
+                System.err.println(
+                        "User Service'e kullanıcı oluşturulurken hata oluştu. " +
+                                "Deneme: " + attempt + "/" + maxAttempts
+                );
+
+                e.printStackTrace();
+
+                if (attempt == maxAttempts) {
+                    throw new IllegalStateException(
+                            "Root user could not be created in user-service.",
+                            e
+                    );
+                }
+
                 try {
-                    if(attempt==maxAttempts-1)
-                        return;
                     Thread.sleep(5000);
                 } catch (InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException(interruptedException);
+
+                    throw new RuntimeException(
+                            "Root user creation retry interrupted.",
+                            interruptedException
+                    );
                 }
             }
         }
-        throw new IllegalStateException("Root user could not be created.");
     }
 }

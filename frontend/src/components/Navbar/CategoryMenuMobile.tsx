@@ -10,7 +10,8 @@ import OrdersMe from "./../../assets/Navbar/OrdersMe.png";
 import setting from "./../../assets/Navbar/setting.png";
 import mobileMenuCart from "./../../assets/Navbar/MobileMenuCart.png";
 import navbarProfileIcon from "./../../assets/Navbar/NavbarProfileIcon.png";
-import { categories } from "../../data/Categories";
+
+import { categories } from "../../data/categories";
 
 import { AuthContext } from "../../context/AuthContext";
 
@@ -25,7 +26,13 @@ const CategoryMenuMobile = () => {
 
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("CategoryMenuMobile must be used within AuthProvider");
+  }
+
+  const { isAuthenticated, setIsAuthenticated } = authContext;
 
   const navigate = useNavigate();
 
@@ -76,10 +83,7 @@ const CategoryMenuMobile = () => {
   };
 
   return (
-    <div
-      ref={menuRef}
-      className="relative md:hidden"
-    >
+    <div ref={menuRef} className="relative md:hidden">
       {/* Mobile Navbar Icon */}
       <button
         onClick={handleMenuClick}
@@ -123,13 +127,11 @@ const CategoryMenuMobile = () => {
           }`}
       >
         <div className="flex flex-col p-3">
-
           {/* Categories */}
           <div className="mb-2 border-b border-black/10 pb-2">
             {Object.keys(categories).map((era) => {
               return (
                 <div key={era}>
-
                   {/* Era */}
                   <button
                     onClick={() => handleEraClick(era)}
@@ -173,7 +175,6 @@ const CategoryMenuMobile = () => {
                       </div>
                     </div>
                   </div>
-
                 </div>
               );
             })}
@@ -183,7 +184,6 @@ const CategoryMenuMobile = () => {
             <>
               {/* User Menu */}
               <div className="flex flex-col gap-1">
-
                 {/* Cart */}
                 <button
                   onClick={() => handleNavigate("/cart")}
@@ -280,19 +280,16 @@ const CategoryMenuMobile = () => {
 
                   <span>Çıkış Yap</span>
                 </button>
-
               </div>
             </>
           ) : (
             /* Login / Register */
             <div className="flex flex-col gap-1">
-
               <button
                 onClick={() => handleNavigate("/login")}
                 className="group flex w-full items-center gap-3 rounded-lg
                   px-4 py-3 text-left font-bold
-                  transition-all duration-200
-                  hover:bg-black/[0.06] hover:pl-5"
+                  transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
               >
                 <img
                   className="w-5 transition-transform duration-200 group-hover:scale-110"
@@ -302,10 +299,8 @@ const CategoryMenuMobile = () => {
 
                 <span>Giriş Yap / Kayıt Ol</span>
               </button>
-
             </div>
           )}
-
         </div>
       </div>
     </div>

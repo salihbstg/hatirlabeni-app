@@ -7,6 +7,7 @@ import com.hatirlabeni.userservice.dtos.UserResponse;
 import com.hatirlabeni.userservice.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,6 +30,11 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    @PostMapping("/create-root")
+    ResponseEntity<Void> createRoot(@RequestBody CreateUserRequest createUserRequest){
+        userService.createRoot(createUserRequest);
+        return ResponseEntity.noContent().build();
+    }
 
     @Operation(
             summary = "Yeni kullanıcı oluştur",
@@ -171,5 +177,12 @@ public class UserController {
             @RequestHeader("Authorization") String token
     ) {
         return ResponseEntity.ok(userService.isActive(uuid));
+    }
+
+    @PostMapping("/mail-activation/{uuid}")
+    @SecurityRequirement(name="bearerAuth")
+    ResponseEntity<Void> mailActivation(@PathVariable UUID uuid){
+        userService.mailActivation(uuid);
+        return ResponseEntity.noContent().build();
     }
 }

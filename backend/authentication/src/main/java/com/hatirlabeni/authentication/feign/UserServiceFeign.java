@@ -19,11 +19,14 @@ public interface UserServiceFeign {
     UserResponse createUser(@RequestBody CreateUserRequest createUserRequest);
 
     @DeleteMapping("admin/{uuid}")
-    Void deleteUser(@PathVariable("uuid") UUID uuid);
+    void deleteUser(@PathVariable("uuid") UUID uuid);
 
     @GetMapping("/isActive/{uuid}")
     Boolean isActive(
             @RequestHeader("Authorization") String token,
             @PathVariable(name = "uuid")UUID uuid
     );
+
+    @PostMapping("/create-root")
+    void createRoot(@RequestBody CreateUserRequest createUserRequest);
 }

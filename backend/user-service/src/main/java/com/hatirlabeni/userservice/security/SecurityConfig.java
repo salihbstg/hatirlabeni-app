@@ -32,6 +32,8 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/v1/users")
                         .permitAll()
+                        .requestMatchers("/api/v1/users/create-root")
+                        .permitAll()
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
