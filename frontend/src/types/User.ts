@@ -9,7 +9,7 @@ export type Address = {
   addressLine: string;
 };
 
-export type saveAddress = {
+export type SaveAddress = {
   title: string;
   city: string;
   district: string;

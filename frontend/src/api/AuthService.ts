@@ -4,7 +4,8 @@ import type {
   RegisterResponse,
   ForgotPasswordRequest,
   ResetPasswordRequest,
-} from "../types/Auth";
+  VerifyMailRequest,
+} from "../types/auth";
 import api from "./axios";
 
 export const register = async (formData: RegisterForm) => {
@@ -34,3 +35,11 @@ export const resetPassword = async (
 ) => {
   await api.post("/auth/reset-password", resetPasswordRequest);
 };
+
+export const sendMailActivationLink = async()=>{
+  await api.post("/auth/mail-activation")
+}
+
+export const verifyMail = async(token:VerifyMailRequest)=>{
+  await api.post("/auth/mail-verify",token)
+}

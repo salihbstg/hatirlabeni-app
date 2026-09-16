@@ -68,3 +68,7 @@ export type ResetPasswordRequest = {
   token: String;
   newPassword: String;
 };
+
+export type VerifyMailRequest={
+  token:string
+}

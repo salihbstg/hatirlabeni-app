@@ -10,7 +10,7 @@ import ProfileDetails from "../components/Profile/ProfileDetails/ProfileDetails"
 
 import { deleteTokens } from "../utils/Token";
 
-import type { MeResponse } from "../types/Auth";
+import type { MeResponse } from "../types/auth";
 
 import { me } from "../api/AuthService";
 
@@ -23,7 +23,7 @@ const Profile = () => {
   const [activeCard, setActiveCard] = useState<string | null>("profile");
   const [activeMenu, setActiveMenu] = useState<string | null>("profile");
 
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, setIsAuthenticated } = useContext<any>(AuthContext);
 
   const navigate = useNavigate();
 
@@ -266,11 +266,6 @@ const Profile = () => {
               <ProfileDetails profile={profile} />
             )}
 
-            {activeMenu === "profile" && !profile && (
-              <div className="flex min-h-[300px] items-center justify-center text-gray-500">
-                Profil bilgileri yükleniyor...
-              </div>
-            )}
 
             {activeMenu === "orders" && (
               <div className="text-xl font-semibold">{"Tüm siparişlerim"}</div>

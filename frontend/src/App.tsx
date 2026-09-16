@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import Profile from "./pages/Profile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-
+import MailActivationPage from "./pages/MailActivationPage"
 function App() {
   return (
     <>
@@ -26,6 +26,7 @@ function App() {
             path="/forgot-password"
             element={<ForgotPassword></ForgotPassword>}
           ></Route>
+          <Route path="/activation" element={<MailActivationPage></MailActivationPage>} ></Route>
         </Routes>
       </BrowserRouter>
     </>
