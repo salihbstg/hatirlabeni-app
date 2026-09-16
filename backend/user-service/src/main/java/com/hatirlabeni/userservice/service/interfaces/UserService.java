@@ -25,4 +25,6 @@ public interface UserService {
     void createRoot(CreateUserRequest createUserRequest);
 
     void mailActivation(UUID uuid);
+
+    Boolean mailIsActive(UUID uuid);
 }

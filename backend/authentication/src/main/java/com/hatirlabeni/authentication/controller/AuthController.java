@@ -2,6 +2,7 @@ package com.hatirlabeni.authentication.controller;
 
 import com.hatirlabeni.authentication.dtos.*;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
+import feign.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -168,6 +169,18 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest){
         authService.resetPassword(resetPasswordRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/mail-activation")
+    public ResponseEntity<Void> createAndSendActivationToken(){
+        authService.createAndSendActivationToken();
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/mail-verify")
+    public ResponseEntity<Void> verifyMail(@RequestBody VerifyMailRequest verifyMailRequest){
+        authService.verifyAndConsumeActivationToken(verifyMailRequest);
         return ResponseEntity.noContent().build();
     }
 }

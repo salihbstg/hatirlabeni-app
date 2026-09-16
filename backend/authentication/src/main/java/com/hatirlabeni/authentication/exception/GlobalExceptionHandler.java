@@ -183,6 +183,32 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MailActivationTokenNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleMailActivationTokenNotFoundException(
+            ExpiredPasswordResetTokenException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        List.of(ex.getMessage())
+                )
+        );
+    }
+
+    @ExceptionHandler(MailAlreadyActivatedException.class)
+    public ResponseEntity<ErrorResponse> handleMailAlreadyActivatedException(
+            MailAlreadyActivatedException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        List.of(ex.getMessage())
+                )
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
         System.out.println(ex.getMessage());

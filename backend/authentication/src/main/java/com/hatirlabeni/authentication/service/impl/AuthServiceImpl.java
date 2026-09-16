@@ -2,11 +2,13 @@ package com.hatirlabeni.authentication.service.impl;
 
 import com.hatirlabeni.authentication.dtos.*;
 import com.hatirlabeni.authentication.entity.AuthUser;
+import com.hatirlabeni.authentication.entity.MailActivationToken;
 import com.hatirlabeni.authentication.entity.PasswordResetToken;
 import com.hatirlabeni.authentication.enums.Role;
 import com.hatirlabeni.authentication.exception.*;
 import com.hatirlabeni.authentication.feign.UserServiceFeign;
 import com.hatirlabeni.authentication.repository.AuthUserRepository;
+import com.hatirlabeni.authentication.repository.MailActivationTokenRepository;
 import com.hatirlabeni.authentication.repository.PasswordResetTokenRepository;
 import com.hatirlabeni.authentication.security.JwtService;
 import com.hatirlabeni.authentication.security.SecurityConfig;
@@ -15,6 +17,8 @@ import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
@@ -35,7 +39,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final SecurityConfig securityConfig;
     @Value("${FRONTEND_URL}")
     private String frontendUrl;
 
@@ -46,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
     private final ObjectMapper objectMapper;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final MailService mailService;
-
+    private final MailActivationTokenRepository mailActivationTokenRepository;
 
     private UserResponse createUserOnUserService(CreateUserRequest request) {
         try {
@@ -126,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private String generateResetToken() {
+    private String generateToken() {
         SecureRandom secureRandom = new SecureRandom();
 
         byte[] bytes = new byte[32];
@@ -137,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
                 .encodeToString(bytes);
     }
 
-    private String hashResetPasswordToken(String token) {
+    private String hashToken(String token) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
@@ -272,10 +275,10 @@ public class AuthServiceImpl implements AuthService {
                         forgotPasswordRequest.identifier(),
                         forgotPasswordRequest.identifier())
                 .orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı"));
-        String token = generateResetToken();
+        String token = generateToken();
         PasswordResetToken passwordResetToken = new PasswordResetToken();
         passwordResetToken.setUserUUID(user.getUuid());
-        passwordResetToken.setTokenHash(hashResetPasswordToken(token));
+        passwordResetToken.setTokenHash(hashToken(token));
         passwordResetTokenRepository.save(passwordResetToken);
 
         String resetLink = frontendUrl + "/reset-password?token=" + token;
@@ -285,7 +288,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByTokenHash(hashResetPasswordToken(resetPasswordRequest.token())).orElseThrow(() ->
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByTokenHash(hashToken(resetPasswordRequest.token())).orElseThrow(() ->
                 new InvalidPasswordResetTokenException("Geçersiz veya bulunamayan şifre sıfırlama tokenı")
         );
         if (passwordResetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -294,10 +297,47 @@ public class AuthServiceImpl implements AuthService {
         if (passwordResetToken.getUsedAt() != null) {
             throw new InvalidPasswordResetTokenException("Bu şifre sıfırlama bağlantısı daha önce kullanılmış.");
         }
-        AuthUser authUser=authUserRepository.findByUuid(passwordResetToken.getUserUUID()).orElseThrow(()-> new UserNotFoundException("Kullanıcı bulunamadı"));
+        AuthUser authUser = authUserRepository.findByUuid(passwordResetToken.getUserUUID()).orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı"));
         authUser.setPassword(passwordEncoder.encode(resetPasswordRequest.newPassword()));
         authUserRepository.save(authUser);
         passwordResetToken.setUsedAt(LocalDateTime.now());
         passwordResetTokenRepository.save(passwordResetToken);
+    }
+
+    @Override
+    public void createAndSendActivationToken() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new UserNotFoundException("Kullanıcı doğrulanamadı.");
+        }
+        String username=auth.getName();
+        AuthUser user = authUserRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı."));
+        if(userServiceFeign.mailIsActive(user.getUuid())){
+            throw new MailAlreadyActivatedException();
+        }
+        String token = generateToken();
+        String activationLink = frontendUrl + "/activation?token=" + token;
+        MailActivationToken mailActivationToken = new MailActivationToken();
+        mailActivationToken.setTokenHash(hashToken(token));
+        mailActivationToken.setUserUUID(user.getUuid());
+        mailActivationTokenRepository.save(mailActivationToken);
+        mailService.sendSimpleMail(user.getEmail(), "Mail adresi doğrulama", "Mail adresinizi doğrulamak için linke tıklayınız.\n\n" + activationLink);
+    }
+
+    @Override
+    @Transactional
+    public void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest){
+        System.out.println("GELEN TOKEN: " + verifyMailRequest.token());
+
+        String hashedToken = hashToken(verifyMailRequest.token());
+
+        System.out.println("HASHLENEN TOKEN: " + hashedToken);
+        MailActivationToken mailActivationToken=mailActivationTokenRepository.findByTokenHash(hashedToken).orElseThrow(MailActivationTokenNotFoundException::new);
+        if(mailActivationToken.getExpiresAt().isBefore(LocalDateTime.now())){
+            mailActivationTokenRepository.deleteByUserUUID(mailActivationToken.getUserUUID());
+            throw new ExpiredPasswordResetTokenException("Token süresi dolmuştur, lütfen işlemi yeniden başlatınız.");
+        }
+        userServiceFeign.mailActivation(mailActivationToken.getUserUUID());
+        mailActivationTokenRepository.deleteByUserUUID(mailActivationToken.getUserUUID());
     }
 }

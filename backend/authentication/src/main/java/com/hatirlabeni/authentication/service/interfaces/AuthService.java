@@ -27,4 +27,8 @@ public interface AuthService {
     void forgotPassword(ForgotPasswordRequest forgotPasswordRequest);
 
     void resetPassword(ResetPasswordRequest resetPasswordRequest);
+
+    void createAndSendActivationToken();
+    void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest);
+
 }

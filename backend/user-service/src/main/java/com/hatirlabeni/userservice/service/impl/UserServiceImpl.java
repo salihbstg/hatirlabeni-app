@@ -176,6 +176,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Boolean mailIsActive(UUID uuid) {
+        User user=userRepository.findByUuid(uuid).orElseThrow(UserNotFoundException::new);
+        return user.isMailActivation();
+    }
+
+    @Override
     public UserProfileResponse getUserByNationalId(String nationalId) {
         User user = userRepository.findByNationalId(nationalId).orElseThrow(UserNotFoundException::new);
         return toUserProfileResponse(

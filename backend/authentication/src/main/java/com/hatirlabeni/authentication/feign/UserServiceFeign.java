@@ -3,6 +3,7 @@ package com.hatirlabeni.authentication.feign;
 import com.hatirlabeni.authentication.config.FeignConfig;
 import com.hatirlabeni.authentication.dtos.CreateUserRequest;
 import com.hatirlabeni.authentication.dtos.UserResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,4 +30,10 @@ public interface UserServiceFeign {
 
     @PostMapping("/create-root")
     void createRoot(@RequestBody CreateUserRequest createUserRequest);
+
+    @PostMapping("/mail-activation/{uuid}")
+    void mailActivation(@PathVariable UUID uuid);
+
+    @GetMapping("/mail-is-active/{uuid}")
+    Boolean mailIsActive(@PathVariable UUID uuid);
 }

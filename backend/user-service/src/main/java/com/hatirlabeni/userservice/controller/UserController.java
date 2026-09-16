@@ -5,6 +5,7 @@ import com.hatirlabeni.userservice.dtos.UpdateUserRequest;
 import com.hatirlabeni.userservice.dtos.UserProfileResponse;
 import com.hatirlabeni.userservice.dtos.UserResponse;
 import com.hatirlabeni.userservice.service.interfaces.UserService;
+import feign.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -184,5 +185,10 @@ public class UserController {
     ResponseEntity<Void> mailActivation(@PathVariable UUID uuid){
         userService.mailActivation(uuid);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/mail-is-active/{uuid}")
+    ResponseEntity<Boolean> mailIsActive(@PathVariable UUID uuid){
+        return ResponseEntity.ok(userService.mailIsActive(uuid));
     }
 }
