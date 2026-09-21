@@ -17,6 +17,11 @@ export const login = async (formData: LoginRequest) => {
   const response = await api.post<LoginRequest>("/auth/login", formData);
   return response.data;
 };
+export const refresh = async () => {
+  const response = await api.post("/auth/refresh");
+  
+  return response.data;
+};
 
 export const me = async () => {
   const response = await api.get("/users/me");

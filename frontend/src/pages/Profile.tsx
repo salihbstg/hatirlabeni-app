@@ -17,13 +17,18 @@ import { me } from "../api/AuthService";
 import toast from "react-hot-toast";
 
 import { Navigate, useNavigate } from "react-router-dom";
+
 import Addresses from "../components/Profile/Adresses/Addresses";
 
 const Profile = () => {
   const [activeCard, setActiveCard] = useState<string | null>("profile");
   const [activeMenu, setActiveMenu] = useState<string | null>("profile");
 
-  const { isAuthenticated, setIsAuthenticated } = useContext<any>(AuthContext);
+  const {
+    isAuthenticated,
+    setIsAuthenticated,
+    isLoading,
+  } = useContext<any>(AuthContext);
 
   const navigate = useNavigate();
 
@@ -46,6 +51,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     deleteTokens();
+
     setIsAuthenticated(false);
 
     toast.success("Çıkış yapıldı.");
@@ -60,10 +66,19 @@ const Profile = () => {
     setActiveMenu(menu);
   };
 
+  /*
+   * AuthContext henüz token kontrolünü / refresh işlemini
+   * tamamlamadıysa login'e yönlendirme yapma.
+   */
+  if (isLoading) {
+    return null;
+  }
+
   if (!isAuthenticated) {
     setTimeout(() => {
       toast.error("Lütfen giriş yapınız.");
     }, 500);
+
     return <Navigate to="/login" replace />;
   }
 
@@ -72,10 +87,12 @@ const Profile = () => {
       <Navbar />
 
       <div className="flex flex-1 flex-col md:flex-row gap-3 md:gap-0 px-2 sm:px-4 md:px-6 lg:px-8 pt-2 pb-4 md:pb-5">
+
         {/* ================= MOBILE MENU ================= */}
 
         <div className="md:hidden w-full">
           <div className="flex gap-2 overflow-x-auto pb-2">
+
             <ProfileMenuCard
               title="Tüm siparişlerim"
               description="Tüm siparişlerinizi görüntüleyin."
@@ -162,6 +179,7 @@ const Profile = () => {
                 handleLogout();
               }}
             />
+
           </div>
         </div>
 
@@ -169,6 +187,7 @@ const Profile = () => {
 
         <aside className="hidden md:flex w-full md:w-[30%] lg:w-[28%] min-h-0 text-black">
           <div className="w-full min-h-0 overflow-y-auto rounded-lg border border-[#6B4733] bg-[#E5EDE0] shadow-sm">
+
             <ProfileMenuCard
               title="Tüm siparişlerim"
               description="Tüm siparişlerinizi görüntüleyin."
@@ -255,6 +274,7 @@ const Profile = () => {
                 handleLogout();
               }}
             />
+
           </div>
         </aside>
 
@@ -262,17 +282,21 @@ const Profile = () => {
 
         <main className="w-full md:w-[70%] lg:w-[72%] min-h-0 md:ms-3">
           <div className="h-full min-h-[500px] overflow-y-auto rounded-lg border border-[#6B4733] bg-white p-3 sm:p-5 lg:p-7 shadow-sm">
+
             {activeMenu === "profile" && profile && (
               <ProfileDetails profile={profile} />
             )}
 
-
             {activeMenu === "orders" && (
-              <div className="text-xl font-semibold">{"Tüm siparişlerim"}</div>
+              <div className="text-xl font-semibold">
+                {"Tüm siparişlerim"}
+              </div>
             )}
 
             {activeMenu === "favorites" && (
-              <div className="text-xl font-semibold">{"Favorilerim"}</div>
+              <div className="text-xl font-semibold">
+                {"Favorilerim"}
+              </div>
             )}
 
             {activeMenu === "reviews" && (
@@ -283,35 +307,49 @@ const Profile = () => {
 
             {activeMenu === "addresses" && (
               <div className="text-xl font-semibold">
-                {<Addresses></Addresses>}
+                <Addresses />
               </div>
             )}
 
             {activeMenu === "coupons" && (
-              <div className="text-xl font-semibold">{"Kuponlar"}</div>
+              <div className="text-xl font-semibold">
+                {"Kuponlar"}
+              </div>
             )}
 
             {activeMenu === "accountSettings" && (
-              <div className="text-xl font-semibold">{"Hesap Ayarları"}</div>
+              <div className="text-xl font-semibold">
+                {"Hesap Ayarları"}
+              </div>
             )}
 
             {activeMenu === "messages" && (
-              <div className="text-xl font-semibold">{"Mesajlarım"}</div>
+              <div className="text-xl font-semibold">
+                {"Mesajlarım"}
+              </div>
             )}
 
             {activeMenu === "nostalgicMemories" && (
-              <div className="text-xl font-semibold">{"Topluluk"}</div>
+              <div className="text-xl font-semibold">
+                {"Topluluk"}
+              </div>
             )}
 
             {activeMenu === "requestsAndComplaints" && (
-              <div className="text-xl font-semibold">{"Talep ve şikayet"}</div>
+              <div className="text-xl font-semibold">
+                {"Talep ve şikayet"}
+              </div>
             )}
 
             {activeMenu === "interfaceSettingsDescription" && (
-              <div className="text-xl font-semibold">{"Arayüz"}</div>
+              <div className="text-xl font-semibold">
+                {"Arayüz"}
+              </div>
             )}
+
           </div>
         </main>
+
       </div>
     </div>
   );

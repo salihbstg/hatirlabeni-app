@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, setIsAuthenticated } = useContext<any>(AuthContext);
 
   // Logout işlemi
   const logOut = () => {

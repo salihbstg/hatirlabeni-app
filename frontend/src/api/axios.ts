@@ -6,15 +6,24 @@ const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+api.interceptors.request.use(
+  (config) => {
+    const isRefreshRequest = config.url === "/auth/refresh";
 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    const token = isRefreshRequest
+      ? localStorage.getItem("refreshToken")
+      : localStorage.getItem("accessToken");
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-
-  return config;
-});
+);
 
 api.interceptors.response.use(
   (response) => {
@@ -33,15 +42,14 @@ api.interceptors.response.use(
     });
 
     if (
-       error.response?.status === 401 &&
-  !originalRequest._retry &&
-  originalRequest.url !== "/auth/login" &&
-  originalRequest.url !== "/auth/refresh"
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      originalRequest.url !== "/auth/login" &&
+      originalRequest.url !== "/auth/refresh"
     ) {
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem("refreshToken");
-
 
       if (!refreshToken) {
         localStorage.removeItem("accessToken");
@@ -53,7 +61,6 @@ api.interceptors.response.use(
       }
 
       try {
-
         const response = await axios.post(
           "http://localhost:8080/api/v1/auth/refresh",
           {},
@@ -64,27 +71,16 @@ api.interceptors.response.use(
           }
         );
 
-
         const newAccessToken = response.data.accessToken;
         const newRefreshToken = response.data.refreshToken;
 
-
-
-
         saveTokens(newAccessToken, newRefreshToken);
-
- 
 
         originalRequest.headers.Authorization =
           `Bearer ${newAccessToken}`;
 
-     
-
-     
-
         return api(originalRequest);
       } catch (refreshError) {
-
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
 

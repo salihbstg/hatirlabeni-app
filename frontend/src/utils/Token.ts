@@ -1,9 +1,31 @@
-export const saveTokens = (accessToken, refreshToken) => {
-    localStorage.setItem("accessToken",accessToken);
-    localStorage.setItem("refreshToken",refreshToken)
+import { jwtDecode } from "jwt-decode";
+
+export const saveTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken)
 };
 
-export const deleteTokens=()=>{
-    localStorage.clear("accessToken");
-    localStorage.clear("refreshToken");
+export const deleteTokens = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 }
+
+interface JwtPayload {
+    exp: number;
+}
+
+export const isAccessTokenValid = (): boolean => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+        return false;
+    }
+
+    try {
+        const decoded = jwtDecode<JwtPayload>(token);
+
+        return decoded.exp * 1000 > Date.now();
+    } catch {
+        return false;
+    }
+};
