@@ -1,46 +1,53 @@
 import axios from "axios";
+import type {
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
 
-import { saveTokens } from "../utils/Token";
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 const api = axios.create({
   baseURL: "http://localhost:8080/api/v1",
+  withCredentials: true,
 });
 
+// REQUEST INTERCEPTOR
 api.interceptors.request.use(
   (config) => {
-    const isRefreshRequest = config.url === "/auth/refresh";
+    const token = localStorage.getItem("accessToken");
 
-    const token = isRefreshRequest
-      ? localStorage.getItem("refreshToken")
-      : localStorage.getItem("accessToken");
-
-    if (token) {
+    // Refresh isteğinde access token gönderme
+    if (token && config.url !== "/auth/refresh") {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// RESPONSE INTERCEPTOR
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
 
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest =
+      error.config as CustomAxiosRequestConfig | undefined;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
     console.log("API ERROR:", {
       status: error.response?.status,
-      url: originalRequest?.url,
-      method: originalRequest?.method,
-      authorization: originalRequest?.headers?.Authorization,
+      url: originalRequest.url,
+      method: originalRequest.method,
       response: error.response?.data,
     });
 
+    // Yalnızca 401 durumunda refresh dene
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -49,40 +56,26 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
-
-      if (!refreshToken) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-
-        window.location.href = "/login";
-
-        return Promise.reject(error);
-      }
-
       try {
-        const response = await axios.post(
-          "http://localhost:8080/api/v1/auth/refresh",
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${refreshToken}`,
-            },
-          }
-        );
+        // Refresh token HttpOnly cookie ile otomatik gönderilir
+        const response = await api.post("/auth/refresh");
 
         const newAccessToken = response.data.accessToken;
-        const newRefreshToken = response.data.refreshToken;
 
-        saveTokens(newAccessToken, newRefreshToken);
+        if (!newAccessToken) {
+          throw new Error("Refresh yanıtında accessToken bulunamadı.");
+        }
 
-        originalRequest.headers.Authorization =
-          `Bearer ${newAccessToken}`;
+        // Yeni access token'ı kaydet
+        localStorage.setItem("accessToken", newAccessToken);
+
+        // Başarısız isteği yeni token ile tekrarla
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
         return api(originalRequest);
       } catch (refreshError) {
+        // Refresh başarısızsa oturumu temizle
         localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
 
         window.location.href = "/login";
 

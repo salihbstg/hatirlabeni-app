@@ -8,13 +8,13 @@ import java.util.UUID;
 public interface AuthService {
     RegisterResponse register(RegisterRequest registerRequest);
 
-    LoginResponse login(LoginRequest loginRequest);
+    LoginResult login(LoginRequest loginRequest);
 
     AuthUserResponse getByUuid(UUID uuid);
 
     AuthUserResponse getByUsername(String username);
 
-    LoginResponse refresh(String token);
+    LoginResult refresh(String token);
 
     void deleteAuthUser(UUID uuid);
 

@@ -170,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResult login(LoginRequest loginRequest) {
 
         AuthUser authUser = findAuthUser(loginRequest.identifier(), loginRequest.identifier());
 
@@ -178,13 +178,16 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidCredentialsException("Giriş bilgileri hatalı!");
         }
         String token = jwtService.generateToken(authUser);
-
+        String refreshToken= jwtService.generateRefreshToken(authUser);
         userIsActive(token, authUser.getUuid());
 
-        return new LoginResponse(
+        LoginResponse loginResponse=new LoginResponse(
                 token,
-                jwtService.generateRefreshToken(authUser),
                 "Bearer"
+        );
+        return new LoginResult(
+                loginResponse,
+                refreshToken
         );
     }
 
@@ -203,25 +206,32 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse refresh(String token) {
+    public LoginResult refresh(String token) {
+
         String tokenType = jwtService.extractTokenType(token);
+
         if (!"refresh".equals(tokenType)) {
             throw new InvalidTokenException("Invalid refresh token");
         }
+
         String username = jwtService.extractUsername(token);
+
         AuthUser authUser = authUserRepository.findByUsername(username)
-                .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
+                .orElseThrow(() ->
+                        new InvalidTokenException("Invalid refresh token")
+                );
 
         String accessToken = jwtService.generateToken(authUser);
         String newRefreshToken = jwtService.generateRefreshToken(authUser);
 
         userIsActive(accessToken, authUser.getUuid());
 
-        return new LoginResponse(
+        LoginResponse loginResponse = new LoginResponse(
                 accessToken,
-                newRefreshToken,
                 "Bearer"
         );
+
+        return new LoginResult(loginResponse, newRefreshToken);
     }
 
     @Override
@@ -310,9 +320,9 @@ public class AuthServiceImpl implements AuthService {
         if (auth == null || !auth.isAuthenticated()) {
             throw new UserNotFoundException("Kullanıcı doğrulanamadı.");
         }
-        String username=auth.getName();
+        String username = auth.getName();
         AuthUser user = authUserRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı."));
-        if(userServiceFeign.mailIsActive(user.getUuid())){
+        if (userServiceFeign.mailIsActive(user.getUuid())) {
             throw new MailAlreadyActivatedException();
         }
         String token = generateToken();
@@ -326,14 +336,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest){
+    public void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest) {
         System.out.println("GELEN TOKEN: " + verifyMailRequest.token());
 
         String hashedToken = hashToken(verifyMailRequest.token());
 
         System.out.println("HASHLENEN TOKEN: " + hashedToken);
-        MailActivationToken mailActivationToken=mailActivationTokenRepository.findByTokenHash(hashedToken).orElseThrow(MailActivationTokenNotFoundException::new);
-        if(mailActivationToken.getExpiresAt().isBefore(LocalDateTime.now())){
+        MailActivationToken mailActivationToken = mailActivationTokenRepository.findByTokenHash(hashedToken).orElseThrow(MailActivationTokenNotFoundException::new);
+        if (mailActivationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             mailActivationTokenRepository.deleteByUserUUID(mailActivationToken.getUserUUID());
             throw new ExpiredPasswordResetTokenException("Token süresi dolmuştur, lütfen işlemi yeniden başlatınız.");
         }

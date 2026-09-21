@@ -1,5 +1,7 @@
 package com.hatirlabeni.userservice.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,41 +15,57 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<CustomErrorResponse> dataIntegrityViolationException(
             DataIntegrityViolationException e
     ) {
 
-        String message = e.getMessage();
+        String constraintName = getConstraintName(e);
 
-        List<String> errors = new ArrayList<>();
+        String errorMessage = switch (
+                constraintName != null ? constraintName : ""
+                ) {
+            case "uk_users_telephone" -> "Telefon numarası zaten kayıtlı.";
 
-        if (message != null && message.contains("Key (telephone)")) {
-            errors.add("Telefon numarası zaten kayıtlı.");
-        }
+            case "uk_users_national_id" -> "T.C. kimlik numarası zaten kayıtlı.";
 
-        if (message != null && message.contains("Key (national_id)")) {
-            errors.add("T.C. kimlik numarası zaten kayıtlı.");
-        }
+            case "uk_users_uuid" -> "Kullanıcı UUID değeri zaten kayıtlı.";
 
-        if (errors.isEmpty()) {
-            errors.add("Kullanıcı bilgileri zaten kayıtlı.");
-        }
+            default -> "Veri bütünlüğü ihlali nedeniyle işlem gerçekleştirilemedi.";
+        };
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(new CustomErrorResponse(
                         LocalDateTime.now(),
                         HttpStatus.CONFLICT.value(),
-                        errors
+                        List.of(errorMessage)
                 ));
+    }
+
+    private String getConstraintName(Throwable exception) {
+
+        Throwable current = exception;
+
+        while (current != null) {
+
+            if (current instanceof
+                    org.hibernate.exception.ConstraintViolationException ex) {
+                return ex.getConstraintName();
+            }
+
+            current = current.getCause();
+        }
+
+        return null;
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -56,7 +74,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
                 List.of(e.getMessage())
-                ));
+        ));
     }
 
     @ExceptionHandler(UserAuthenticationException.class)
@@ -70,7 +88,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<CustomErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        List<String> errors=e.getBindingResult()
+        List<String> errors = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -130,18 +148,24 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AddressNotFoundException.class)
     ResponseEntity<CustomErrorResponse> addressNotFoundException(AddressNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CustomErrorResponse(
-           LocalDateTime.now(),
-           HttpStatus.NOT_FOUND.value(),
-           List.of(e.getMessage())
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                List.of(e.getMessage())
         ));
     }
 
-    @ExceptionHandler(AdminStatusChangeNotAllowedException.class)
-    ResponseEntity<CustomErrorResponse> adminIsImmutableException(AdminStatusChangeNotAllowedException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new CustomErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.FORBIDDEN.value(),
-                List.of(e.getMessage())
-        ));
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CustomErrorResponse> handleUnexpectedException(
+            Exception e
+    ) {
+        log.error("Beklenmeyen bir hata oluştu.", e);
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new CustomErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        List.of("Beklenmeyen bir hata oluştu.")
+                ));
     }
 }

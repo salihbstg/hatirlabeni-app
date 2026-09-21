@@ -1,8 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 
-export const saveTokens = (accessToken: string, refreshToken: string) => {
+export const saveTokens = (accessToken: string) => {
     localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken)
 };
 
 export const deleteTokens = () => {

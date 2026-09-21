@@ -10,14 +10,31 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Table(name = "users")
 @Entity
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_users_uuid",
+                        columnNames = "uuid"
+                ),
+                @UniqueConstraint(
+                        name = "uk_users_national_id",
+                        columnNames = "national_id"
+                ),
+                @UniqueConstraint(
+                        name = "uk_users_telephone",
+                        columnNames = "telephone"
+                )
+        }
+)
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, updatable = false)
+    @Column(nullable = false, updatable = false)
     private UUID uuid;
 
     @Column(nullable = false)
@@ -26,10 +43,10 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String nationalId;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String telephone;
 
     @Column(nullable = false)
@@ -50,8 +67,8 @@ public class User {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.mailActivation=false;
-        this.active=true;
+        this.mailActivation = false;
+        this.active = true;
     }
 
     @PreUpdate

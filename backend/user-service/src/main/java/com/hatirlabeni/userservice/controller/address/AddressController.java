@@ -4,6 +4,7 @@ import com.hatirlabeni.userservice.dtos.address.AddressResponse;
 import com.hatirlabeni.userservice.dtos.address.CreateAddressRequest;
 import com.hatirlabeni.userservice.dtos.address.UpdateAddressRequest;
 import com.hatirlabeni.userservice.service.address.AddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ import java.util.List;
 public class AddressController {
     private final AddressService addressService;
     @PostMapping
-    ResponseEntity<AddressResponse> createAddress(@RequestBody CreateAddressRequest createAddressRequest) {
+    ResponseEntity<AddressResponse> createAddress(@Valid @RequestBody CreateAddressRequest createAddressRequest) {
         return ResponseEntity.ok(addressService.createAddress(createAddressRequest));
     }
     @GetMapping
@@ -29,7 +30,7 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
     @PutMapping
-    ResponseEntity<AddressResponse> updateAddress(@RequestBody UpdateAddressRequest updateAddressRequest,@RequestParam Long addressId) {
+    ResponseEntity<AddressResponse> updateAddress(@Valid @RequestBody UpdateAddressRequest updateAddressRequest, @RequestParam Long addressId) {
         return addressService.updateAddress(updateAddressRequest,addressId);
     }
 }
