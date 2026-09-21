@@ -1,6 +1,14 @@
 package com.hatirlabeni.authentication.controller;
 
-import com.hatirlabeni.authentication.dtos.*;
+import com.hatirlabeni.authentication.dtos.AuthUserResponse;
+import com.hatirlabeni.authentication.dtos.ForgotPasswordRequest;
+import com.hatirlabeni.authentication.dtos.LoginRequest;
+import com.hatirlabeni.authentication.dtos.LoginResponse;
+import com.hatirlabeni.authentication.dtos.LoginResult;
+import com.hatirlabeni.authentication.dtos.RegisterRequest;
+import com.hatirlabeni.authentication.dtos.RegisterResponse;
+import com.hatirlabeni.authentication.dtos.ResetPasswordRequest;
+import com.hatirlabeni.authentication.dtos.VerifyMailRequest;
 import com.hatirlabeni.authentication.security.JwtCookieService;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,19 +17,25 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(
         name = "Authentication",
@@ -55,17 +69,20 @@ public class AuthController {
             )
     })
     @PostMapping("/register")
-    ResponseEntity<RegisterResponse> register(
+    public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody RegisterRequest registerRequest
     ) {
+        RegisterResponse response = authService.register(registerRequest);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(authService.register(registerRequest));
+                .body(response);
     }
 
     @Operation(
             summary = "Kullanıcı girişi yap",
-            description = "Kullanıcı adı veya email ve şifre ile kimlik doğrulaması yapar. Access token response body'de, refresh token ise HttpOnly Cookie olarak döndürülür."
+            description = "Kullanıcı adı veya email ve şifre ile kimlik doğrulaması yapar. " +
+                    "Access token response body'de, refresh token ise HttpOnly Cookie olarak döndürülür."
     )
     @ApiResponses({
             @ApiResponse(
@@ -90,10 +107,9 @@ public class AuthController {
             )
     })
     @PostMapping("/login")
-    ResponseEntity<LoginResponse> login(
+    public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest loginRequest
     ) {
-
         LoginResult loginResult = authService.login(loginRequest);
 
         ResponseCookie refreshCookie =
@@ -116,10 +132,6 @@ public class AuthController {
                     description = "Access token başarıyla yenilendi."
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Refresh token bilgisi geçersiz."
-            ),
-            @ApiResponse(
                     responseCode = "401",
                     description = "Refresh token geçersiz veya süresi dolmuş."
             ),
@@ -131,25 +143,31 @@ public class AuthController {
                     responseCode = "500",
                     description = "Sunucu tarafında beklenmeyen bir hata oluştu."
             )
-    })@PostMapping("/refresh")
+    })
+    @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(
-            @CookieValue(value = "refreshToken", required = false)
+            @CookieValue(
+                    value = "refreshToken",
+                    required = false
+            )
             String refreshToken
     ) {
-
         if (refreshToken == null || refreshToken.isBlank()) {
-            return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED)
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
                     .build();
         }
 
-        LoginResult result = authService.refresh(refreshToken);
+        LoginResult loginResult = authService.refresh(refreshToken);
 
-        ResponseCookie cookie =
-                jwtCookieService.createRefreshTokenCookie(result.refreshToken());
+        ResponseCookie refreshCookie =
+                jwtCookieService.createRefreshTokenCookie(
+                        loginResult.refreshToken()
+                );
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(result.loginResponse());
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(loginResult.loginResponse());
     }
 
     @Operation(
@@ -181,32 +199,42 @@ public class AuthController {
                     description = "Kullanıcının UUID'si",
                     required = true
             )
-            @PathVariable("uuid") UUID uuid
+            @PathVariable UUID uuid
     ) {
         return ResponseEntity.ok(authService.getByUuid(uuid));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+    public ResponseEntity<Void> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest
+    ) {
         authService.forgotPassword(forgotPasswordRequest);
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+    public ResponseEntity<Void> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest resetPasswordRequest
+    ) {
         authService.resetPassword(resetPasswordRequest);
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/mail-activation")
     public ResponseEntity<Void> createAndSendActivationToken() {
         authService.createAndSendActivationToken();
+
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/mail-verify")
-    public ResponseEntity<Void> verifyMail(@RequestBody VerifyMailRequest verifyMailRequest) {
+    public ResponseEntity<Void> verifyMail(
+            @Valid @RequestBody VerifyMailRequest verifyMailRequest
+    ) {
         authService.verifyAndConsumeActivationToken(verifyMailRequest);
+
         return ResponseEntity.noContent().build();
     }
 }

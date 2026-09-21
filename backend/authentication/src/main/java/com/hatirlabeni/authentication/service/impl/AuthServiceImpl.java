@@ -337,11 +337,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest) {
-        System.out.println("GELEN TOKEN: " + verifyMailRequest.token());
 
         String hashedToken = hashToken(verifyMailRequest.token());
 
-        System.out.println("HASHLENEN TOKEN: " + hashedToken);
         MailActivationToken mailActivationToken = mailActivationTokenRepository.findByTokenHash(hashedToken).orElseThrow(MailActivationTokenNotFoundException::new);
         if (mailActivationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             mailActivationTokenRepository.deleteByUserUUID(mailActivationToken.getUserUUID());
