@@ -22,6 +22,9 @@ export const refresh = async () => {
   
   return response.data;
 };
+export const logout = async () => {
+  await api.post("/auth/logout");
+};
 
 export const me = async () => {
   const response = await api.get("/users/me");

@@ -34,7 +34,7 @@ const LoginPage = () => {
     try {
       const response = await login(formData);
 
-      saveTokens(response.accessToken, response.refreshToken);
+      saveTokens(response.accessToken);
 
       toast.success(
         "Giriş başarılı, anasayfaya yönlendiriliyorsunuz."

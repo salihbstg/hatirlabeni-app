@@ -2,6 +2,7 @@ import { jwtDecode } from "jwt-decode";
 
 export const saveTokens = (accessToken: string) => {
     localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("sessionActive", "true");
 };
 
 export const deleteTokens = () => {
