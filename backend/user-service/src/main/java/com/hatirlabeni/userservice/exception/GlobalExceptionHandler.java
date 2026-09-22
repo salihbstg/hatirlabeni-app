@@ -37,9 +37,9 @@ public class GlobalExceptionHandler {
 
             case "uk_users_national_id" -> "T.C. kimlik numarası zaten kayıtlı.";
 
-            case "uk_users_uuid" -> "Kullanıcı UUID değeri zaten kayıtlı.";
+            case "uk_users_uuid" -> "Kullanıcı UUID değeri zaten kayıtlı, lütfen yeniden deneyiniz.";
 
-            default -> "Veri bütünlüğü ihlali nedeniyle işlem gerçekleştirilemedi.";
+            default -> "Sistemde kayıtlı olan bilgiler nedeniyle işlem gerçekleştirilemedi, lütfen bilgilerinizi kontrol ederek yeniden deneyiniz.";
         };
 
         return ResponseEntity
