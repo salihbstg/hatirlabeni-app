@@ -35,4 +35,5 @@ public interface AuthService {
             String email
     );
 
+    void changePassword(String token,ChangePasswordRequest changePasswordRequest);
 }

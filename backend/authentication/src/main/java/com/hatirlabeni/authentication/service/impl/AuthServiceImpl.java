@@ -19,6 +19,7 @@ import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,6 +41,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final SecurityConfig securityConfig;
     @Value("${FRONTEND_URL}")
     private String frontendUrl;
 
@@ -452,5 +453,16 @@ public class AuthServiceImpl implements AuthService {
                 accessToken,
                 "Bearer"
         );
+    }
+
+    @Override
+    public void changePassword(String token,ChangePasswordRequest changePasswordRequest) {
+        String username=jwtService.extractUsername(token);
+        AuthUser authUser=authUserRepository.findByUsername(username).orElseThrow(()->new UserNotFoundException("Kullanıcı bulunamadı"));
+        if(!passwordEncoder.matches(changePasswordRequest.currentPassword(),authUser.getPassword())){
+            throw new BadCredentialsException("Mevcut şifreniz hatalı.");
+        }
+        authUser.setPassword(passwordEncoder.encode(changePasswordRequest.newPassword()));
+        authUserRepository.save(authUser);
     }
 }
