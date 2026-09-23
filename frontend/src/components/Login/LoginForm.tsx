@@ -1,4 +1,4 @@
-import { useContext, useState, type FormEvent, type ChangeEvent } from "react";
+import { useContext, useState, type FormEvent, type ChangeEvent, type SubmitEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -38,7 +38,7 @@ const LoginForm = () => {
   };
 
   // Kullanıcı giriş işlemini gerçekleştirir.
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (isSubmitting) return;
@@ -65,7 +65,7 @@ const LoginForm = () => {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          toast.error("Giriş bilgileri hatalı.");
+          error.response.data.errors.map(error=>toast.error(error));
         } else if (
           error.response?.status &&
           error.response.status >= 500

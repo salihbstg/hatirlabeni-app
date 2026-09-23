@@ -40,13 +40,6 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    console.log("API ERROR:", {
-      status: error.response?.status,
-      url: originalRequest.url,
-      method: originalRequest.method,
-      response: error.response?.data,
-    });
-
     // Yalnızca 401 durumunda refresh dene
     if (
       error.response?.status === 401 &&

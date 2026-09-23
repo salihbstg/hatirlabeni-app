@@ -31,11 +31,6 @@ export const profileMenuItems: ProfileMenuItem[] = [
     description: "Kayıtlı adreslerinizi yönetin.",
   },
   {
-    id: "coupons",
-    title: "Kuponlar",
-    description: "Kuponlarınızı kullanın.",
-  },
-  {
     id: "accountSettings",
     title: "Hesap Ayarları",
     description: "Hesap ve güvenlik ayarları.",
@@ -46,18 +41,8 @@ export const profileMenuItems: ProfileMenuItem[] = [
     description: "Mesajlarınızı görüntüleyin ve yanıtlayın.",
   },
   {
-    id: "nostalgicMemories",
-    title: "Topluluk",
-    description: "Nostaljik anılarınızı kullanıcılarımız ile paylaşın.",
-  },
-  {
     id: "requestsAndComplaints",
     title: "Talep ve şikayet",
     description: "Talep ve şikayetlerinizi bizlere bildirebilirsiniz.",
-  },
-  {
-    id: "interfaceSettingsDescription",
-    title: "Arayüz",
-    description: "Site içi arayüz ayarlarını kontrol edebilirsiniz.",
   },
 ];

@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
 
 import avatar from "../../assets/Navbar/Avatar.png";
@@ -19,6 +18,7 @@ const UserMenu = () => {
   const navigate = useNavigate();
 
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   if (!authContext) {
     throw new Error("UserMenu, AuthProvider içerisinde kullanılmalıdır.");
@@ -26,13 +26,19 @@ const UserMenu = () => {
 
   const { isAuthenticated, handleLogout } = authContext;
 
-  const closeMenu = () => setIsOpen(false);
+  const closeMenu = (returnFocus = true) => {
+    setIsOpen(false);
+
+    if (returnFocus) {
+      triggerRef.current?.focus();
+    }
+  };
 
   const logOut = async () => {
     try {
       await handleLogout();
     } finally {
-      closeMenu();
+      closeMenu(false);
       navigate("/login", { replace: true });
     }
   };
@@ -49,7 +55,7 @@ const UserMenu = () => {
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && isOpen) {
         closeMenu();
       }
     };
@@ -61,7 +67,7 @@ const UserMenu = () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", handleEscape);
     };
-  }, []);
+  }, [isOpen]);
 
   if (!isAuthenticated) {
     return null;
@@ -115,6 +121,7 @@ const UserMenu = () => {
 
         {/* Profil Menüsü Butonu */}
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
           aria-label="Kullanıcı menüsünü aç"
@@ -137,7 +144,7 @@ const UserMenu = () => {
       {/* Dropdown Menü */}
       <div
         role="menu"
-        aria-hidden={!isOpen}
+        aria-label="Kullanıcı menüsü"
         className={`absolute right-0 top-full z-50 mt-2 w-[min(300px,calc(100vw-2rem))] origin-top-right rounded-xl border border-[#e8e2d5] bg-[#fffdf8] p-1.5 shadow-[0_12px_35px_rgba(45,38,25,0.12)] transition-all duration-200 ${
           isOpen
             ? "visible translate-y-0 scale-100 opacity-100"
@@ -162,7 +169,7 @@ const UserMenu = () => {
               key={item.path}
               to={item.path}
               role="menuitem"
-              onClick={closeMenu}
+              onClick={() => closeMenu(false)}
               className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-[#4b5149] transition-colors duration-150 hover:bg-[#f2eee4] hover:text-[#a45f2a]"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f3f0e8] transition-colors group-hover:bg-white">
@@ -176,7 +183,7 @@ const UserMenu = () => {
               <span className="flex-1">{item.label}</span>
 
               <span className="text-base text-[#c5b9a5] transition-transform group-hover:translate-x-0.5">
-                ›
+                &gt;
               </span>
             </Link>
           ))}

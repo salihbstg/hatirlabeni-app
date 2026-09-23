@@ -65,10 +65,15 @@ export type ForgotPasswordRequest = {
 };
 
 export type ResetPasswordRequest = {
-  token: String;
-  newPassword: String;
+  token: String,
+  newPassword: String
 };
 
 export type VerifyMailRequest={
-  token:string
+  token:String
+}
+
+export type ChangePasswordRequest={
+  currentPassword:String,
+  newPassword:String
 }

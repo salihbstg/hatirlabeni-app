@@ -5,6 +5,7 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   VerifyMailRequest,
+  ChangePasswordRequest
 } from "../types/auth";
 import api from "./ApiClient";
 export const register = async (formData: RegisterForm) => {
@@ -32,7 +33,6 @@ export const me = async () => {
 export const forgotPassword = async (
   forgotPasswordRequest: ForgotPasswordRequest,
 ) => {
-  console.log("GÖNDERİLEN REQUEST:", forgotPasswordRequest);
   await api.post("/auth/forgot-password", forgotPasswordRequest);
 };
 
@@ -48,4 +48,8 @@ export const sendMailActivationLink = async()=>{
 
 export const verifyMail = async(token:VerifyMailRequest)=>{
   await api.post("/auth/mail-verify",token)
+}
+
+export const changePassword = async (changePasswordRequest:ChangePasswordRequest)=>{
+  await api.patch("/auth/change-password",changePasswordRequest);
 }

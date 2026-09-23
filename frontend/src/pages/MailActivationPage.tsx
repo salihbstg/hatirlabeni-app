@@ -27,8 +27,6 @@ const ActivationPage = () => {
             return;
           }
         } catch {
-          // Kullanıcı giriş yapmamış olabilir.
-          // Bu durumda activation token ile devam edeceğiz.
           console.log(
             "Me isteği başarısız oldu, activation token ile devam ediliyor."
           );

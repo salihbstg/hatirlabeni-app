@@ -1,7 +1,9 @@
+import { useState, type SubmitEvent } from "react";
 import type { MeResponse } from "../../types/auth";
-
+import { changePassword } from "../../api/AuthService";
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
 import Addresses from "./Adresses/Addresses";
+import toast from "react-hot-toast";
 
 interface ProfileContentProps {
   activeMenu: string | null;
@@ -45,7 +47,6 @@ interface EmptySectionProps {
 const EmptySection = ({ title, description }: EmptySectionProps) => {
   return (
     <div className="flex min-h-[240px] flex-col items-center justify-center px-4 py-8 text-center">
-      {/* Decorative Icon */}
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#e9e0d1] bg-[#f7f2e8]">
         <svg
           className="h-5 w-5 text-[#a45f2a]"
@@ -59,7 +60,6 @@ const EmptySection = ({ title, description }: EmptySectionProps) => {
             strokeWidth="1.5"
             strokeLinejoin="round"
           />
-
           <path
             d="M13.5 4V9H18.5M8.5 13H15.5M8.5 16.5H13"
             stroke="currentColor"
@@ -87,21 +87,121 @@ const EmptySection = ({ title, description }: EmptySectionProps) => {
   );
 };
 
-const ProfileContent = ({
-  activeMenu,
-  profile,
-}: ProfileContentProps) => {
-  const title = activeMenu
-    ? sectionTitles[activeMenu]
-    : "Hesabım";
+const ChangePasswordSection = () => {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Yeni şifreler birbiriyle eşleşmiyor.");
+      return;
+    }
+    try{
+      await changePassword({ currentPassword, newPassword });
+      toast.success("Şifre değişikliği tamamlandı.");
+    }
+    catch(e){
+      console.log(e);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-[#e8e0d2] bg-[#fffdf8] p-5 shadow-[0_4px_18px_rgba(63,52,35,0.04)] sm:p-6">
+      <div className="mb-6 border-b border-[#eee7da] pb-4">
+        <h3 className="text-base font-semibold tracking-tight text-[#3f493e] sm:text-lg">
+          Şifre Değiştir
+        </h3>
+
+        <p className="mt-1.5 text-xs leading-5 text-[#928878]">
+          Hesabının güvenliği için mevcut şifreni doğrula ve yeni şifreni
+          belirle.
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2"
+      >
+        <div className="md:col-span-2">
+          <label
+            htmlFor="currentPassword"
+            className="mb-2 block text-xs font-medium text-[#6f675a]"
+          >
+            Mevcut Şifre
+          </label>
+
+          <input
+            id="currentPassword"
+            type="password"
+            value={currentPassword}
+            onChange={(event) => setCurrentPassword(event.target.value)}
+            placeholder="Mevcut şifrenizi girin"
+            required
+            className="w-full rounded-xl border border-[#ddd4c5] bg-[#fffdf8] px-4 py-3 text-sm text-[#3f493e] outline-none transition placeholder:text-[#aaa194] focus:border-[#b47745] focus:ring-2 focus:ring-[#b47745]/10"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="newPassword"
+            className="mb-2 block text-xs font-medium text-[#6f675a]"
+          >
+            Yeni Şifre
+          </label>
+
+          <input
+            id="newPassword"
+            type="password"
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            placeholder="Yeni şifrenizi girin"
+            required
+            className="w-full rounded-xl border border-[#ddd4c5] bg-[#fffdf8] px-4 py-3 text-sm text-[#3f493e] outline-none transition placeholder:text-[#aaa194] focus:border-[#b47745] focus:ring-2 focus:ring-[#b47745]/10"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="confirmPassword"
+            className="mb-2 block text-xs font-medium text-[#6f675a]"
+          >
+            Yeni Şifre Tekrar
+          </label>
+
+          <input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            placeholder="Yeni şifrenizi tekrar girin"
+            required
+            className="w-full rounded-xl border border-[#ddd4c5] bg-[#fffdf8] px-4 py-3 text-sm text-[#3f493e] outline-none transition placeholder:text-[#aaa194] focus:border-[#b47745] focus:ring-2 focus:ring-[#b47745]/10"
+          />
+        </div>
+
+        <div className="md:col-span-2 flex justify-end pt-2">
+          <button
+            type="submit"
+            className="rounded-xl bg-[#a45f2a] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#8f5123] active:scale-[0.98]"
+          >
+            Şifreyi Değiştir
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+const ProfileContent = ({ activeMenu, profile }: ProfileContentProps) => {
+  const title = activeMenu ? sectionTitles[activeMenu] : "Hesabım";
 
   const description = activeMenu
     ? sectionDescriptions[activeMenu]
     : "Hesap işlemlerini buradan yönetebilirsin.";
 
-  const isKnownSection = activeMenu
-    ? activeMenu in sectionTitles
-    : false;
+  const isKnownSection = activeMenu ? activeMenu in sectionTitles : false;
 
   return (
     <section
@@ -187,12 +287,7 @@ const ProfileContent = ({
           )}
 
           {/* Account Settings */}
-          {activeMenu === "accountSettings" && (
-            <EmptySection
-              title="Hesap ayarların"
-              description="Hesabınla ilgili tercihlerini ve güvenlik ayarlarını buradan yönetebileceksin."
-            />
-          )}
+          {activeMenu === "accountSettings" && <ChangePasswordSection />}
 
           {/* Messages */}
           {activeMenu === "messages" && (
