@@ -1,5 +1,6 @@
 package com.hatirlabeni.authentication.entity;
 
+import com.hatirlabeni.authentication.enums.AuthProvider;
 import com.hatirlabeni.authentication.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,5 +37,9 @@ public class AuthUser {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuthProvider authProvider=AuthProvider.LOCAL;
 
 }

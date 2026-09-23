@@ -30,5 +30,9 @@ public interface AuthService {
 
     void createAndSendActivationToken();
     void verifyAndConsumeActivationToken(VerifyMailRequest verifyMailRequest);
+    LoginResponse registerWithGoogle(
+            GoogleRegisterRequest request,
+            String email
+    );
 
 }

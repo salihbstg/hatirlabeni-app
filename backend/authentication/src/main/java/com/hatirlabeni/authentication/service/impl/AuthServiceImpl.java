@@ -4,12 +4,14 @@ import com.hatirlabeni.authentication.dtos.*;
 import com.hatirlabeni.authentication.entity.AuthUser;
 import com.hatirlabeni.authentication.entity.MailActivationToken;
 import com.hatirlabeni.authentication.entity.PasswordResetToken;
+import com.hatirlabeni.authentication.enums.AuthProvider;
 import com.hatirlabeni.authentication.enums.Role;
 import com.hatirlabeni.authentication.exception.*;
 import com.hatirlabeni.authentication.feign.UserServiceFeign;
 import com.hatirlabeni.authentication.repository.AuthUserRepository;
 import com.hatirlabeni.authentication.repository.MailActivationTokenRepository;
 import com.hatirlabeni.authentication.repository.PasswordResetTokenRepository;
+import com.hatirlabeni.authentication.security.JwtCookieService;
 import com.hatirlabeni.authentication.security.JwtService;
 import com.hatirlabeni.authentication.security.SecurityConfig;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
@@ -50,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final MailService mailService;
     private final MailActivationTokenRepository mailActivationTokenRepository;
+    private final JwtCookieService jwtCookieService;
 
     private UserResponse createUserOnUserService(CreateUserRequest request) {
         try {
@@ -315,23 +318,60 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public void createAndSendActivationToken() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
+
+        // 1. Mevcut oturumun Authentication bilgisini al.
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        // 2. Kullanıcının gerçekten giriş yapmış olduğunu doğrula.
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication.getName() == null
+                || authentication.getName().isBlank()
+                || "anonymousUser".equals(authentication.getName())) {
+
             throw new UserNotFoundException("Kullanıcı doğrulanamadı.");
         }
-        String username = auth.getName();
-        AuthUser user = authUserRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Kullanıcı bulunamadı."));
+
+        // 3. JWT üzerinden gelen kullanıcı adını veya email'i al.
+        String identifier = authentication.getName();
+
+        // 4. Kullanıcıyı username veya email üzerinden bul.
+        AuthUser user = authUserRepository
+                .findByUsernameOrEmail(identifier, identifier)
+                .orElseThrow(() ->
+                        new UserNotFoundException("Kullanıcı bulunamadı.")
+                );
+
+        // 5. Kullanıcının maili zaten aktif mi kontrol et.
         if (userServiceFeign.mailIsActive(user.getUuid())) {
             throw new MailAlreadyActivatedException();
         }
+
+        // 6. Kullanıcı için aktivasyon token'ı oluştur.
         String token = generateToken();
-        String activationLink = frontendUrl + "/activation?token=" + token;
-        MailActivationToken mailActivationToken = new MailActivationToken();
-        mailActivationToken.setTokenHash(hashToken(token));
-        mailActivationToken.setUserUUID(user.getUuid());
-        mailActivationTokenRepository.save(mailActivationToken);
-        mailService.sendSimpleMail(user.getEmail(), "Mail adresi doğrulama", "Mail adresinizi doğrulamak için linke tıklayınız.\n\n" + activationLink);
+
+        // 7. Aktivasyon linkini oluştur.
+        String activationLink =
+                frontendUrl + "/activation?token=" + token;
+
+        // 8. Token kaydını oluştur.
+        MailActivationToken activationToken = new MailActivationToken();
+
+        activationToken.setTokenHash(hashToken(token));
+        activationToken.setUserUUID(user.getUuid());
+
+        mailActivationTokenRepository.save(activationToken);
+
+        // 9. Aktivasyon mailini gönder.
+        mailService.sendSimpleMail(
+                user.getEmail(),
+                "Mail adresi doğrulama",
+                "Mail adresinizi doğrulamak için aşağıdaki bağlantıya tıklayınız.\n\n"
+                        + activationLink
+        );
     }
 
     @Override
@@ -347,5 +387,70 @@ public class AuthServiceImpl implements AuthService {
         }
         userServiceFeign.mailActivation(mailActivationToken.getUserUUID());
         mailActivationTokenRepository.deleteByUserUUID(mailActivationToken.getUserUUID());
+    }
+
+    @Override
+    public LoginResponse registerWithGoogle(GoogleRegisterRequest request, String email) {
+
+        // 1. Google e-postası daha önce kayıt edilmiş mi?
+        if (authUserRepository.findByEmail(email).isPresent()) {
+            throw new IllegalStateException(
+                    "Bu e-posta adresi zaten kayıtlı."
+            );
+        }
+
+        // 2. Kullanıcı adı daha önce alınmış mı?
+        if (authUserRepository.existsByUsername(request.username())) {
+            throw new IllegalStateException(
+                    "Bu kullanıcı adı zaten kullanılıyor."
+            );
+        }
+
+        // 3. Google kullanıcısı için rastgele, girişte kullanılmayacak parola oluştur.
+        byte[] randomBytes = new byte[32];
+        new SecureRandom().nextBytes(randomBytes);
+
+        String randomPassword = Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(randomBytes);
+
+        // 4. AuthUser oluştur.
+        AuthUser authUser = new AuthUser();
+
+        authUser.setUuid(java.util.UUID.randomUUID());
+        authUser.setUsername(request.username());
+        authUser.setEmail(email);
+        authUser.setPassword(passwordEncoder.encode(randomPassword));
+        authUser.setRole(Role.USER);
+        authUser.setAuthProvider(AuthProvider.GOOGLE);
+
+        // 5. Authentication DB'ye kaydet.
+
+        AuthUser savedAuthUser = authUserRepository.save(authUser);
+
+        // 6. User Service üzerinde kullanıcı profilini oluştur.
+        userServiceFeign.createUser(
+                new CreateUserRequest(
+                        savedAuthUser.getUuid(),
+                        request.firstName(),
+                        request.lastName(),
+                        request.identityNumber(),
+                        request.telephone(),
+                        request.birthday()
+                )
+        );
+
+        // 7. JWT tokenlarını oluştur.
+        String accessToken = jwtService.generateToken(savedAuthUser);
+        String refreshToken = jwtService.generateRefreshToken(savedAuthUser);
+
+        // 8. Refresh token cookie'sini oluştur.
+        jwtCookieService.createRefreshTokenCookie(refreshToken);
+
+        // 9. LoginResponse döndür.
+        return new LoginResponse(
+                accessToken,
+                "Bearer"
+        );
     }
 }

@@ -22,6 +22,9 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${REFRESH_EXPIRATION}")
+    private Long refreshExpiration;
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(
                 secret.getBytes(StandardCharsets.UTF_8)
@@ -51,7 +54,7 @@ public class JwtService {
                 .issuedAt(new Date())
                 .expiration(
                         new Date(
-                                System.currentTimeMillis() + expiration * 24 * 7
+                                System.currentTimeMillis() + refreshExpiration * 24 * 7
                         )
                 )
                 .signWith(getSigningKey())
