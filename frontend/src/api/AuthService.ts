@@ -18,7 +18,6 @@ export const login = async (formData: LoginRequest) => {
 };
 export const refresh = async () => {
   const response = await api.post("/auth/refresh");
-  
   return response.data;
 };
 export const logout = async () => {
