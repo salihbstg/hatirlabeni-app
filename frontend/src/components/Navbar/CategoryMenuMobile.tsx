@@ -1,27 +1,23 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import navbarMenuIcon from "./../../assets/Navbar/MenuIcon.png";
-import menuCloseIcon from "./../../assets/Navbar/MenuCloseIcon.png";
+import navbarMenuIcon from "../../assets/Navbar/MenuIcon.png";
+import menuCloseIcon from "../../assets/Navbar/MenuCloseIcon.png";
 
-import avatar from "./../../assets/Navbar/Avatar.png";
-import email from "./../../assets/Navbar/email.png";
-import logout from "./../../assets/Navbar/logout.png";
-import OrdersMe from "./../../assets/Navbar/OrdersMe.png";
-import setting from "./../../assets/Navbar/setting.png";
-import mobileMenuCart from "./../../assets/Navbar/MobileMenuCart.png";
-import navbarProfileIcon from "./../../assets/Navbar/NavbarProfileIcon.png";
+import avatar from "../../assets/Navbar/Avatar.png";
+import email from "../../assets/Navbar/email.png";
+import logout from "../../assets/Navbar/logout.png";
+import OrdersMe from "../../assets/Navbar/OrdersMe.png";
+import setting from "../../assets/Navbar/setting.png";
+import mobileMenuCart from "../../assets/Navbar/MobileMenuCart.png";
+import navbarProfileIcon from "../../assets/Navbar/NavbarProfileIcon.png";
 
 import { categories } from "../../data/categories";
-
 import { AuthContext } from "../../context/AuthContext";
-
 import { deleteTokens } from "../../utils/Token";
-
-import { useNavigate } from "react-router-dom";
 
 const CategoryMenuMobile = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const [selectedEra, setSelectedEra] = useState<string | null>(null);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -36,87 +32,107 @@ const CategoryMenuMobile = () => {
 
   const navigate = useNavigate();
 
-  // Menü dışına tıklama
+  // Menüyü kapat ve açık kategoriyi sıfırla
+  const closeMenu = () => {
+    setIsOpen(false);
+    setSelectedEra(null);
+  };
+
+  // Menü dışına tıklama ve Escape tuşu kontrolü
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
-        setSelectedEra(null);
+        closeMenu();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
   // Ana menüyü aç / kapat
-  const handleMenuClick = () => {
+  const handleMenuToggle = () => {
     setIsOpen((current) => !current);
   };
 
-  // Era menüsünü aç / kapat
-  const handleEraClick = (era: string) => {
+  // Kategori dönemini aç / kapat
+  const handleEraToggle = (era: string) => {
     setSelectedEra((current) => (current === era ? null : era));
   };
 
-  // Logout
-  const logOut = () => {
-    deleteTokens();
-
-    setTimeout(() => {
-      setIsAuthenticated(false);
-      setIsOpen(false);
-    }, 300);
-  };
-
-  // Menüden sayfaya git
+  // Sayfaya yönlendir ve menüyü kapat
   const handleNavigate = (path: string) => {
     navigate(path);
-    setIsOpen(false);
-    setSelectedEra(null);
+    closeMenu();
+  };
+
+  // Kullanıcı çıkışı
+  const handleLogout = () => {
+    deleteTokens();
+    setIsAuthenticated(false);
+    closeMenu();
+
+    navigate("/login");
   };
 
   return (
     <div ref={menuRef} className="relative md:hidden">
-      {/* Mobile Navbar Icon */}
+      {/* Mobile Menu Toggle */}
       <button
-        onClick={handleMenuClick}
+        type="button"
+        onClick={handleMenuToggle}
+        aria-label={isOpen ? "Menüyü kapat" : "Menüyü aç"}
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation-menu"
         className="group relative h-15 w-15 overflow-hidden select-none"
       >
         {/* Menu Icon */}
         <img
+          src={navbarMenuIcon}
+          alt=""
+          aria-hidden="true"
           className={`absolute inset-0 h-full w-full object-contain
             transition-all duration-300 ease-out ${
               isOpen
                 ? "-translate-x-full opacity-0"
                 : "translate-x-0 opacity-100 group-hover:scale-105"
             }`}
-          src={navbarMenuIcon}
-          alt="navbar_icon"
         />
 
         {/* Close Icon */}
         <img
+          src={menuCloseIcon}
+          alt=""
+          aria-hidden="true"
           className={`absolute inset-0 h-full w-full object-contain
             transition-all duration-300 ease-out ${
               isOpen
                 ? "translate-x-0 opacity-100"
                 : "translate-x-full opacity-0"
             }`}
-          src={menuCloseIcon}
-          alt="menu_close_icon"
         />
       </button>
 
-      {/* Mobile Menu */}
+      {/* Mobile Navigation Menu */}
       <div
-        className={`absolute right-0 top-full z-50 mt-3 w-[320px]
+        id="mobile-navigation-menu"
+        aria-hidden={!isOpen}
+        className={`absolute right-0 top-full z-50 mt-3
+          w-[min(320px,calc(100vw-2rem))]
           origin-top-right overflow-hidden rounded-2xl
           border border-black/5 bg-[#F8F9FA]/95
           shadow-xl backdrop-blur-sm
@@ -126,24 +142,32 @@ const CategoryMenuMobile = () => {
               : "pointer-events-none invisible -translate-y-3 scale-95 opacity-0"
           }`}
       >
-        <div className="flex flex-col p-3">
+        <div className="flex max-h-[calc(100dvh-100px)] flex-col overflow-y-auto p-3">
           {/* Categories */}
           <div className="mb-2 border-b border-black/10 pb-2">
-            {Object.keys(categories).map((era) => {
+            {Object.entries(categories).map(([era, eraCategories]) => {
+              const isEraOpen = selectedEra === era;
+
               return (
                 <div key={era}>
-                  {/* Era */}
+                  {/* Era Button */}
                   <button
-                    onClick={() => handleEraClick(era)}
+                    type="button"
+                    onClick={() => handleEraToggle(era)}
+                    aria-expanded={isEraOpen}
                     className="group flex w-full items-center justify-between
                       rounded-lg px-4 py-3 text-left font-bold
-                      transition-all duration-200 hover:bg-black/[0.06]"
+                      transition-colors duration-200
+                      hover:bg-black/[0.06]
+                      focus-visible:outline-none
+                      focus-visible:ring-2 focus-visible:ring-black/30"
                   >
                     <span>{era}</span>
 
                     <span
+                      aria-hidden="true"
                       className={`text-xs transition-transform duration-300 ${
-                        selectedEra === era ? "rotate-180" : ""
+                        isEraOpen ? "rotate-180" : ""
                       }`}
                     >
                       ▼
@@ -153,25 +177,32 @@ const CategoryMenuMobile = () => {
                   {/* Era Categories */}
                   <div
                     className={`grid overflow-hidden transition-all duration-300 ease-out ${
-                      selectedEra === era
+                      isEraOpen
                         ? "grid-rows-[1fr] opacity-100"
                         : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
                     <div className="min-h-0">
-                      <div className="ml-3 flex flex-col border-l border-black/10 pl-3 pb-1">
-                        {categories[era].map((category) => {
-                          return (
-                            <button
-                              key={category}
-                              className="rounded-lg px-3 py-2 text-left text-sm
-                                font-normal transition-all duration-200
-                                hover:bg-black/[0.06] hover:pl-5"
-                            >
-                              {category}
-                            </button>
-                          );
-                        })}
+                      <div className="ml-3 flex flex-col border-l border-black/10 pb-1 pl-3">
+                        {eraCategories.map((category) => (
+                          <button
+                            key={category}
+                            type="button"
+                            onClick={() => {
+                              // Kategori yönlendirmesi mevcut değil.
+                              // Route yapısı belirlendiğinde buraya eklenecek.
+                              closeMenu();
+                            }}
+                            className="rounded-lg px-3 py-2 text-left
+                              text-sm font-normal
+                              transition-all duration-200
+                              hover:bg-black/[0.06] hover:pl-5
+                              focus-visible:outline-none
+                              focus-visible:ring-2 focus-visible:ring-black/30"
+                          >
+                            {category}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -180,126 +211,150 @@ const CategoryMenuMobile = () => {
             })}
           </div>
 
+          {/* Authenticated User Menu */}
           {isAuthenticated ? (
-            <>
-              {/* User Menu */}
-              <div className="flex flex-col gap-1">
-                {/* Cart */}
-                <button
-                  onClick={() => handleNavigate("/cart")}
-                  className="group flex w-full items-center gap-3 rounded-lg
-                    px-4 py-3 text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={mobileMenuCart}
-                    alt=""
-                  />
-
-                  <span>Sepetim</span>
-                </button>
-
-                {/* Profile */}
-                <button
-                  onClick={() => handleNavigate("/profile")}
-                  className="group flex w-full items-center gap-3 rounded-lg
-                    px-4 py-3 text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={navbarProfileIcon}
-                    alt=""
-                  />
-
-                  <span>Hesabım</span>
-                </button>
-
-                {/* Orders */}
-                <button
-                  onClick={() => handleNavigate("/orders/me")}
-                  className="group flex w-full items-center gap-3 rounded-lg
-                    px-4 py-3 text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={OrdersMe}
-                    alt=""
-                  />
-
-                  <span>Tüm Siparişlerim</span>
-                </button>
-
-                {/* Settings */}
-                <button
-                  onClick={() => handleNavigate("/settings")}
-                  className="group flex w-full items-center gap-3 rounded-lg
-                    px-4 py-3 text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={setting}
-                    alt=""
-                  />
-
-                  <span>Ayarlar</span>
-                </button>
-
-                {/* Messages */}
-                <button
-                  onClick={() => handleNavigate("/messages/me")}
-                  className="group flex w-full items-center gap-3 rounded-lg
-                    px-4 py-3 text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={email}
-                    alt=""
-                  />
-
-                  <span>Mesajlarım</span>
-                </button>
-
-                {/* Logout */}
-                <button
-                  onClick={logOut}
-                  className="group mt-1 flex w-full items-center gap-3
-                    rounded-lg border-t border-black/10 px-4 py-3 pt-4
-                    text-left transition-all duration-200
-                    hover:bg-black/[0.06] hover:pl-5"
-                >
-                  <img
-                    className="w-5 transition-transform duration-200 group-hover:scale-110"
-                    src={logout}
-                    alt=""
-                  />
-
-                  <span>Çıkış Yap</span>
-                </button>
-              </div>
-            </>
-          ) : (
-            /* Login / Register */
             <div className="flex flex-col gap-1">
+              {/* Cart */}
               <button
-                onClick={() => handleNavigate("/login")}
-                className="group flex w-full items-center gap-3 rounded-lg
-                  px-4 py-3 text-left font-bold
-                  transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
+                type="button"
+                onClick={() => handleNavigate("/cart")}
+                className="group flex w-full items-center gap-3
+                  rounded-lg px-4 py-3 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
               >
                 <img
-                  className="w-5 transition-transform duration-200 group-hover:scale-110"
-                  src={avatar}
+                  src={mobileMenuCart}
                   alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
                 />
 
-                <span>Giriş Yap / Kayıt Ol</span>
+                <span>Sepetim</span>
+              </button>
+
+              {/* Profile */}
+              <button
+                type="button"
+                onClick={() => handleNavigate("/profile")}
+                className="group flex w-full items-center gap-3
+                  rounded-lg px-4 py-3 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
+              >
+                <img
+                  src={navbarProfileIcon}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
+                />
+
+                <span>Hesabım</span>
+              </button>
+
+              {/* Orders */}
+              <button
+                type="button"
+                onClick={() => handleNavigate("/orders/me")}
+                className="group flex w-full items-center gap-3
+                  rounded-lg px-4 py-3 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
+              >
+                <img
+                  src={OrdersMe}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
+                />
+
+                <span>Tüm Siparişlerim</span>
+              </button>
+
+              {/* Settings */}
+              <button
+                type="button"
+                onClick={() => handleNavigate("/settings")}
+                className="group flex w-full items-center gap-3
+                  rounded-lg px-4 py-3 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
+              >
+                <img
+                  src={setting}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
+                />
+
+                <span>Ayarlar</span>
+              </button>
+
+              {/* Messages */}
+              <button
+                type="button"
+                onClick={() => handleNavigate("/messages/me")}
+                className="group flex w-full items-center gap-3
+                  rounded-lg px-4 py-3 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
+              >
+                <img
+                  src={email}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
+                />
+
+                <span>Mesajlarım</span>
+              </button>
+
+              {/* Logout */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="group mt-1 flex w-full items-center gap-3
+                  rounded-lg border-t border-black/10
+                  px-4 py-3 pt-4 text-left
+                  transition-all duration-200
+                  hover:bg-black/[0.06] hover:pl-5"
+              >
+                <img
+                  src={logout}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-5 transition-transform duration-200
+                    group-hover:scale-110"
+                />
+
+                <span>Çıkış Yap</span>
               </button>
             </div>
+          ) : (
+            /* Login / Register */
+            <button
+              type="button"
+              onClick={() => handleNavigate("/login")}
+              className="group flex w-full items-center gap-3
+                rounded-lg px-4 py-3 text-left font-bold
+                transition-all duration-200
+                hover:bg-black/[0.06] hover:pl-5"
+            >
+              <img
+                src={avatar}
+                alt=""
+                aria-hidden="true"
+                className="w-5 transition-transform duration-200
+                  group-hover:scale-110"
+              />
+
+              <span>Giriş Yap / Kayıt Ol</span>
+            </button>
           )}
         </div>
       </div>

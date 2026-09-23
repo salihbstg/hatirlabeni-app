@@ -13,7 +13,7 @@
       "Oyuncak",
       "Teknoloji",
       "Sinema & TV",
-      "Oyun",
+      "Oyun"
     ],
     "2000'ler": [
       "Müzik",

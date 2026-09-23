@@ -1,207 +1,211 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
-import "./UserMenu.css";
+import { Link, useNavigate } from "react-router-dom";
 
-import avatar from "./../../assets/Navbar/Avatar.png";
-import email from "./../../assets/Navbar/email.png";
-import logout from "./../../assets/Navbar/logout.png";
-import OrdersMe from "./../../assets/Navbar/OrdersMe.png";
-import setting from "./../../assets/Navbar/setting.png";
-import cart from "./../../assets/Navbar/shopping-cart.png";
-import navbarProfileIcon from "./../../assets/Navbar/NavbarProfileIcon.png";
+import avatar from "../../assets/Navbar/Avatar.png";
+import email from "../../assets/Navbar/email.png";
+import logout from "../../assets/Navbar/logout.png";
+import OrdersMe from "../../assets/Navbar/OrdersMe.png";
+import setting from "../../assets/Navbar/setting.png";
+import cart from "../../assets/Navbar/shopping-cart.png";
+import navbarProfileIcon from "../../assets/Navbar/NavbarProfileIcon.png";
 
 import { AuthContext } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const UserMenu = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [cartCount, setCartCount] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState(false);
 
-    const { isAuthenticated, handleLogout } = useContext<any>(AuthContext);
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-    const menuRef = useRef<HTMLDivElement>(null);
+  if (!authContext) {
+    throw new Error("UserMenu, AuthProvider içerisinde kullanılmalıdır.");
+  }
 
-    // Logout işlemi
-    const logOut = async () => {
-        try {
-            await handleLogout();
-        } finally {
-            setIsOpen(false);
-            navigate("/login");
-        }
+  const { isAuthenticated, handleLogout } = authContext;
+
+  const closeMenu = () => setIsOpen(false);
+
+  const logOut = async () => {
+    try {
+      await handleLogout();
+    } finally {
+      closeMenu();
+      navigate("/login", { replace: true });
+    }
+  };
+
+  // Menü dışına tıklanınca veya Escape tuşuna basılınca kapat.
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        closeMenu();
+      }
     };
 
-    // Menü dışına tıklama kontrolü
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                menuRef.current &&
-                !menuRef.current.contains(event.target as Node)
-            ) {
-                setIsOpen(false);
-            }
-        };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
 
-        document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
-    if (!isAuthenticated) {
-        return null;
-    }
+  if (!isAuthenticated) {
+    return null;
+  }
 
-    return (
-        <div ref={menuRef} className="relative libre-baskerville">
+  const menuItems = [
+    {
+      label: "Hesabım",
+      path: "/profile",
+      icon: navbarProfileIcon,
+    },
+    {
+      label: "Tüm Siparişlerim",
+      path: "/orders/me",
+      icon: OrdersMe,
+    },
+    {
+      label: "Ayarlar",
+      path: "/settings",
+      icon: setting,
+    },
+    {
+      label: "Mesajlarım",
+      path: "/messages/me",
+      icon: email,
+    },
+  ];
 
-            {/* Sepet ve profil alanı */}
-            <div className="flex items-center gap-2">
+  return (
+    <div ref={menuRef} className="relative">
+      {/* Sepet ve Profil */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Sepet */}
+        <button
+          type="button"
+          onClick={() => navigate("/cart")}
+          aria-label="Sepetim"
+          className="group relative flex h-10 w-10 items-center justify-center rounded-full text-[#3f5147] transition-colors hover:bg-[#eae7dc]"
+        >
+          <img
+            src={cart}
+            alt=""
+            className="h-5 w-5 object-contain transition-transform duration-200 group-hover:scale-110"
+          />
 
-                {/* Sepet butonu */}
-                <button
-                    onClick={() => navigate("/cart")}
-                    className="group relative hidden md:flex select-none"
-                >
-                    <img
-                        className="w-14 object-contain transition-all duration-300 ease-out group-hover:scale-105"
-                        src={cart}
-                        alt="Sepet"
-                    />
+          {/* Sepet sayacı */}
+          <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#a45f2a] px-1 text-[10px] font-bold text-white ring-2 ring-[#faf8f2]">
+            0
+          </span>
+        </button>
 
-                    {/* Sepet sayacı */}
-                    <span
-                        className="absolute -right-1 -top-1 flex h-5 min-w-5
-                        items-center justify-center rounded-full
-                        bg-[#A45F2A] px-1.5
-                        text-[10px] font-bold leading-none text-[#FFF8EF]
-                        shadow-md ring-2 ring-[#F8F4EC]
-                        transition-all duration-300 ease-out
-                        group-hover:scale-110"
-                    >
-                        {cartCount}
-                    </span>
-                </button>
+        {/* Profil Menüsü Butonu */}
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-label="Kullanıcı menüsünü aç"
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+          className={`group flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 transition-all duration-200 ${
+            isOpen
+              ? "border-[#a45f2a] ring-2 ring-[#a45f2a]/10"
+              : "border-[#e4dfd3] hover:border-[#a45f2a]"
+          }`}
+        >
+          <img
+            src={avatar}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+          />
+        </button>
+      </div>
 
-                {/* Profil butonu */}
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="group hidden select-none md:flex"
-                >
-                    <img
-                        className={`w-14 object-cover transition-all duration-300 ${
-                            isOpen
-                                ? "scale-110"
-                                : "group-hover:scale-110"
-                        }`}
-                        src={avatar}
-                        alt="Profil"
-                    />
-                </button>
-            </div>
+      {/* Dropdown Menü */}
+      <div
+        role="menu"
+        aria-hidden={!isOpen}
+        className={`absolute right-0 top-full z-50 mt-2 w-[min(300px,calc(100vw-2rem))] origin-top-right rounded-xl border border-[#e8e2d5] bg-[#fffdf8] p-1.5 shadow-[0_12px_35px_rgba(45,38,25,0.12)] transition-all duration-200 ${
+          isOpen
+            ? "visible translate-y-0 scale-100 opacity-100"
+            : "invisible pointer-events-none -translate-y-2 scale-95 opacity-0"
+        }`}
+      >
+        {/* Menü Başlığı */}
+        <div className="border-b border-[#eee8dc] px-3 py-2">
+          <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-[#9b8e78]">
+            Hesabım
+          </p>
 
-            {/* Dropdown menü */}
-            <div
-                className={`absolute right-0 top-full z-20 mt-3 w-[360px]
-                origin-top-right overflow-hidden rounded-xl
-                border border-black/5 bg-[#F8F9FA]/95
-                shadow-xl backdrop-blur-sm
-                transition-all duration-300 ease-out ${
-                    isOpen
-                        ? "pointer-events-auto visible translate-y-0 scale-100 opacity-100"
-                        : "pointer-events-none invisible -translate-y-2 scale-95 opacity-0"
-                }`}
-            >
-                <div className="flex flex-col gap-1 p-3">
-
-                    {/* Hesabım */}
-                    <a
-                        href="/profile"
-                        className="group flex items-center gap-3 rounded-lg px-4 py-3
-                        transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
-                    >
-                        <img
-                            className="w-5 transition-transform duration-200 group-hover:scale-110"
-                            src={navbarProfileIcon}
-                            alt=""
-                        />
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                            Hesabım
-                        </span>
-                    </a>
-
-                    {/* Tüm Siparişlerim */}
-                    <a
-                        href="/orders/me"
-                        className="group flex items-center gap-3 rounded-lg px-4 py-3
-                        transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
-                    >
-                        <img
-                            className="w-5 transition-transform duration-200 group-hover:scale-110"
-                            src={OrdersMe}
-                            alt=""
-                        />
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                            Tüm Siparişlerim
-                        </span>
-                    </a>
-
-                    {/* Ayarlar */}
-                    <a
-                        href="/settings"
-                        className="group flex items-center gap-3 rounded-lg px-4 py-3
-                        transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
-                    >
-                        <img
-                            className="w-5 transition-transform duration-200 group-hover:scale-110"
-                            src={setting}
-                            alt=""
-                        />
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                            Ayarlar
-                        </span>
-                    </a>
-
-                    {/* Mesajlarım */}
-                    <a
-                        href="/messages/me"
-                        className="group flex items-center gap-3 rounded-lg px-4 py-3
-                        transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
-                    >
-                        <img
-                            className="w-5 transition-transform duration-200 group-hover:scale-110"
-                            src={email}
-                            alt=""
-                        />
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                            Mesajlarım
-                        </span>
-                    </a>
-
-                    {/* Çıkış Yap */}
-                    <button
-                        onClick={logOut}
-                        className="group flex w-full items-center gap-3 rounded-lg
-                        px-4 py-3 text-left
-                        transition-all duration-200 hover:bg-black/[0.06] hover:pl-5"
-                    >
-                        <img
-                            className="w-5 transition-transform duration-200 group-hover:scale-110"
-                            src={logout}
-                            alt=""
-                        />
-                        <span className="transition-transform duration-200 group-hover:translate-x-1">
-                            Çıkış Yap
-                        </span>
-                    </button>
-
-                </div>
-            </div>
+          <p className="mt-0.5 text-[13px] font-semibold text-[#3f5147]">
+            HatırlaBeni
+          </p>
         </div>
-    );
+
+        {/* Menü Linkleri */}
+        <nav aria-label="Kullanıcı menüsü" className="py-1">
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              role="menuitem"
+              onClick={closeMenu}
+              className="group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-[#4b5149] transition-colors duration-150 hover:bg-[#f2eee4] hover:text-[#a45f2a]"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f3f0e8] transition-colors group-hover:bg-white">
+                <img
+                  src={item.icon}
+                  alt=""
+                  className="h-4 w-4 object-contain"
+                />
+              </span>
+
+              <span className="flex-1">{item.label}</span>
+
+              <span className="text-base text-[#c5b9a5] transition-transform group-hover:translate-x-0.5">
+                ›
+              </span>
+            </Link>
+          ))}
+        </nav>
+
+        {/* Çıkış */}
+        <div className="border-t border-[#eee8dc] pt-1">
+          <button
+            type="button"
+            role="menuitem"
+            onClick={logOut}
+            className="group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] font-semibold text-[#a34c40] transition-colors duration-150 hover:bg-[#fbeeea]"
+          >
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#f8e9e5]">
+              <img
+                src={logout}
+                alt=""
+                className="h-4 w-4 object-contain"
+              />
+            </span>
+
+            <span className="flex-1">Çıkış Yap</span>
+
+            <span className="text-base opacity-50">↗</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default UserMenu;

@@ -6,8 +6,7 @@ import type {
   ResetPasswordRequest,
   VerifyMailRequest,
 } from "../types/auth";
-import api from "./axios";
-
+import api from "./ApiClient";
 export const register = async (formData: RegisterForm) => {
   const response = await api.post<RegisterResponse>("/auth/register", formData);
   return response.data;

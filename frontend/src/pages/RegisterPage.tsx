@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import logo from "./../assets/Logo.png";
 import "./RegisterPage.css";
 import type { RegisterForm } from "../types/Auth";
-import { register } from "./../api/AuthService";
+import { register } from "../api/AuthService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -45,8 +45,6 @@ const RegisterPage = () => {
     lastName: "",
     nationalId: "",
     telephone: "",
-    city: "",
-    address: "",
     birthday: "",
   });
 

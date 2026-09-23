@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 import locations from "../../../data/Locations";
-
 import { saveAddress } from "../../../api/UserService";
 
 import type { Address } from "../../../types/User";
@@ -11,10 +10,7 @@ type AddressFormProps = {
   onCancel: () => void;
 };
 
-const AddressForm = ({
-  onSave,
-  onCancel,
-}: AddressFormProps) => {
+const AddressForm = ({ onSave, onCancel }: AddressFormProps) => {
   const [title, setTitle] = useState("");
   const [city, setCity] = useState("");
   const [district, setDistrict] = useState("");
@@ -29,8 +25,7 @@ const AddressForm = ({
     message: string;
   } | null>(null);
 
-  const selectedCity =
-    locations[city as keyof typeof locations];
+  const selectedCity = locations[city as keyof typeof locations];
 
   const districts = selectedCity
     ? Object.keys(selectedCity.ilceler)
@@ -117,7 +112,6 @@ const AddressForm = ({
 
   return (
     <div className="relative w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-
       {/* Toast */}
       {toast && (
         <div
@@ -131,6 +125,7 @@ const AddressForm = ({
         </div>
       )}
 
+      {/* Başlık */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-gray-800">
           Yeni Adres Ekle
@@ -142,7 +137,6 @@ const AddressForm = ({
       </div>
 
       <div className="space-y-5">
-
         {/* Adres Başlığı */}
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-gray-600">
@@ -166,16 +160,14 @@ const AddressForm = ({
 
           <select
             value={city}
-            onChange={(e) =>
-              handleCityChange(e.target.value)
-            }
+            onChange={(e) => handleCityChange(e.target.value)}
             className="w-full rounded-xl border border-gray-300 bg-slate-50 px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-[#6B8F86] focus:ring-4 focus:ring-emerald-50"
           >
             <option value="">İl seçiniz</option>
 
-            {Object.keys(locations).map((cityName) => (
+            {Object.keys(locations).map((cityName, index) => (
               <option
-                key={cityName}
+                key={`${cityName}-${index}`}
                 value={cityName}
               >
                 {cityName}
@@ -192,19 +184,15 @@ const AddressForm = ({
 
           <select
             value={district}
-            onChange={(e) =>
-              handleDistrictChange(e.target.value)
-            }
+            onChange={(e) => handleDistrictChange(e.target.value)}
             disabled={!city}
             className="w-full rounded-xl border border-gray-300 bg-slate-50 px-4 py-3 text-sm text-gray-800 outline-none transition disabled:cursor-not-allowed disabled:opacity-50 focus:border-[#6B8F86] focus:ring-4 focus:ring-emerald-50"
           >
-            <option value="">
-              İlçe seçiniz
-            </option>
+            <option value="">İlçe seçiniz</option>
 
-            {districts.map((districtName) => (
+            {districts.map((districtName, index) => (
               <option
-                key={districtName}
+                key={`${districtName}-${index}`}
                 value={districtName}
               >
                 {districtName}
@@ -221,19 +209,15 @@ const AddressForm = ({
 
           <select
             value={neighborhood}
-            onChange={(e) =>
-              setNeighborhood(e.target.value)
-            }
+            onChange={(e) => setNeighborhood(e.target.value)}
             disabled={!district}
             className="w-full rounded-xl border border-gray-300 bg-slate-50 px-4 py-3 text-sm text-gray-800 outline-none transition disabled:cursor-not-allowed disabled:opacity-50 focus:border-[#6B8F86] focus:ring-1 focus:ring-[#6B8F86]"
           >
-            <option value="">
-              Mahalle seçiniz
-            </option>
+            <option value="">Mahalle seçiniz</option>
 
-            {neighborhoods.map((neighborhoodName) => (
+            {neighborhoods.map((neighborhoodName, index) => (
               <option
-                key={neighborhoodName}
+                key={`${neighborhoodName}-${index}`}
                 value={neighborhoodName}
               >
                 {neighborhoodName}
@@ -251,9 +235,7 @@ const AddressForm = ({
           <input
             type="text"
             value={postalCode}
-            onChange={(e) =>
-              setPostalCode(e.target.value)
-            }
+            onChange={(e) => setPostalCode(e.target.value)}
             placeholder="Örn. 34710"
             maxLength={5}
             className="w-full rounded-xl border border-gray-300 bg-slate-50 px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-[#6B8F86] focus:ring-4 focus:ring-emerald-50"
@@ -268,9 +250,7 @@ const AddressForm = ({
 
           <textarea
             value={addressLine}
-            onChange={(e) =>
-              setAddressLine(e.target.value)
-            }
+            onChange={(e) => setAddressLine(e.target.value)}
             placeholder="Sokak, bina no, daire no vb."
             rows={4}
             className="w-full resize-none rounded-xl border border-gray-300 bg-slate-50 px-4 py-3 text-sm leading-6 text-gray-800 outline-none transition focus:border-[#6B8F86] focus:ring-4 focus:ring-emerald-50"

@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "./ApiClient";
 import type { Address, SaveAddress } from "../types/User";
 
 export const saveAddress = async (formData:SaveAddress) => {

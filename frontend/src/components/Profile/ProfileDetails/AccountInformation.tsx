@@ -1,16 +1,32 @@
 import React from "react";
 
-const AccountInformation = ({ auth }) => {
+interface AccountInformationProps {
+  auth: {
+    username: string;
+    email: string;
+  };
+}
+
+const AccountInformation: React.FC<AccountInformationProps> = ({ auth }) => {
+  const accountItems = [
+    {
+      label: "Kullanıcı Adı",
+      value: auth.username,
+    },
+    {
+      label: "E-posta",
+      value: auth.email,
+    },
+  ];
+
   return (
     <div
       className="
         w-full
         flex flex-col
-        gap-5 sm:gap-6 lg:gap-8
-        px-3 py-5
-        sm:px-5 sm:py-6
-        md:px-6 md:py-7
-        lg:px-10 lg:py-8
+        gap-4
+        px-4 py-4
+        sm:px-5 sm:py-5
         border border-gray-200
         rounded-lg
         navbar-font
@@ -24,138 +40,60 @@ const AccountInformation = ({ auth }) => {
         className="
           flex flex-col
           gap-1
-          border-b border-gray-300
-          pb-3 sm:pb-4
+          border-b border-gray-200
+          pb-3
         "
       >
-        <h2
-          className="
-            font-bold
-            text-base
-            sm:text-lg
-            select-none
-          "
-        >
+        <h2 className="text-sm sm:text-base font-bold select-none">
           Hesap Bilgileri
         </h2>
 
-        <span
-          className="
-            text-xs
-            sm:text-sm
-            text-gray-500
-            leading-relaxed
-          "
-        >
+        <span className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">
           Hesap bilgilerinizi görüntüleyebilirsiniz.
         </span>
       </div>
 
       {/* Information Cards */}
-      <div
-        className="
-          w-full
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          gap-3
-          sm:gap-4
-          lg:gap-6
-        "
-      >
-        {/* Kullanıcı Adı */}
-        <div
-          className="
-            w-full
-            min-w-0
-            min-h-[110px]
-            sm:min-h-[120px]
-            flex flex-col
-            justify-between
-            gap-3
-            border border-gray-200
-            rounded-lg
-            px-4 py-4
-            sm:px-5 sm:py-4
-            shadow-sm
-            hover:shadow-md
-            transition
-            box-border
-          "
-        >
-          <span
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {accountItems.map((item) => (
+          <div
+            key={item.label}
             className="
-              text-xs
-              sm:text-sm
-              font-semibold
-              text-gray-500
-            "
-          >
-            Kullanıcı Adı
-          </span>
-
-          <span
-            className="
-              block
               w-full
               min-w-0
-              text-base
-              sm:text-lg
-              font-semibold
-              break-words
-              overflow-wrap-anywhere
+              min-h-[90px]
+              flex flex-col
+              justify-between
+              gap-2
+              border border-gray-200
+              rounded-lg
+              px-3 py-3
+              sm:px-4 sm:py-3
+              shadow-sm
+              hover:shadow-md
+              transition-shadow
+              box-border
             "
           >
-            {auth.username}
-          </span>
-        </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-gray-500">
+              {item.label}
+            </span>
 
-        {/* E-posta */}
-        <div
-          className="
-            w-full
-            min-w-0
-            min-h-[110px]
-            sm:min-h-[120px]
-            flex flex-col
-            justify-between
-            gap-3
-            border border-gray-200
-            rounded-lg
-            px-4 py-4
-            sm:px-5 sm:py-4
-            shadow-sm
-            hover:shadow-md
-            transition
-            box-border
-          "
-        >
-          <span
-            className="
-              text-xs
-              sm:text-sm
-              font-semibold
-              text-gray-500
-            "
-          >
-            E-posta
-          </span>
-
-          <span
-            className="
-              block
-              w-full
-              min-w-0
-              text-base
-              sm:text-lg
-              font-semibold
-              break-words
-              overflow-wrap-anywhere
-            "
-          >
-            {auth.email}
-          </span>
-        </div>
+            <span
+              className="
+                block
+                w-full
+                min-w-0
+                text-sm sm:text-base
+                font-semibold
+                break-words
+                [overflow-wrap:anywhere]
+              "
+            >
+              {item.value || "-"}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

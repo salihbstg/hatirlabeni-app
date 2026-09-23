@@ -1,85 +1,17 @@
-import React, { useState, useContext } from "react";
+import logo from "../assets/Logo.png";
+import googleIcon from "../assets/Login-Register/GoogleIcon.png";
 
-import logo from "./../assets/Logo.png";
-import googleIcon from "./../assets/Login-Register/GoogleIcon.png";
+import "../pages/LoginPage.css";
 
-import "./LoginPage.css";
-
-import type { LoginRequest } from "../types/auth";
-
-import { login } from "./../api/AuthService";
-import { saveTokens } from "../utils/Token";
-
-import toast from "react-hot-toast";
-
-import { useNavigate } from "react-router-dom";
-
-import axios from "axios";
-
-import { AuthContext } from "../context/AuthContext";
+import LoginForm from "../components/Login/LoginForm";
 
 const LoginPage = () => {
-  const { setIsAuthenticated } = useContext<any>(AuthContext);
-
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<LoginRequest>({
-    identifier: "",
-    password: "",
-  });
-
-  const onSubmit = async (e:React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const response = await login(formData);
-
-      saveTokens(response.accessToken);
-
-      toast.success(
-        "Giriş başarılı, anasayfaya yönlendiriliyorsunuz."
-      );
-
-      setIsAuthenticated(true);
-
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 401) {
-          toast.error("Giriş bilgileri hatalı.");
-        } else if (
-          error.response?.status &&
-          error.response.status >= 500
-        ) {
-          toast.error(
-            "Sunucuda bir sorun oluştu. Lütfen daha sonra tekrar deneyin."
-          );
-        } else {
-          toast.error("Beklenmeyen bir hata oluştu.");
-        }
-      } else {
-        toast.error("Beklenmeyen bir hata oluştu.");
-      }
-    }
-  };
-
-  const handleChange = (e:any) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
     <div className="min-h-screen bg-[#F4F1E8] px-4 py-10">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center justify-center">
         <div className="w-full">
-
           {/* CARD */}
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.10)]">
-
             {/* ÜST KISIM */}
             <div className="bg-[#3F5B55] px-6 py-10 text-center sm:px-10">
               <img
@@ -100,7 +32,6 @@ const LoginPage = () => {
 
             {/* FORM ALANI */}
             <div className="px-6 py-8 sm:px-8 sm:py-10">
-
               {/* GOOGLE LOGIN */}
               <button
                 type="button"
@@ -126,87 +57,8 @@ const LoginPage = () => {
                 <div className="h-px flex-1 bg-slate-200" />
               </div>
 
-              {/* FORM */}
-              <form
-                onSubmit={onSubmit}
-                action=""
-                className="flex flex-col gap-5"
-              >
-
-                {/* IDENTIFIER */}
-                <div className="flex flex-col gap-2">
-                  <label
-                    className="text-sm font-semibold text-slate-700"
-                    htmlFor="identifier"
-                  >
-                    Kullanıcı adı veya E-posta
-                  </label>
-
-                  <input
-                    required
-                    onChange={handleChange}
-                    className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#6B8F86] focus:bg-white focus:ring-4 focus:ring-emerald-50"
-                    type="text"
-                    name="identifier"
-                    id="identifier"
-                    autoComplete="username"
-                  />
-                </div>
-
-                {/* PASSWORD */}
-                <div className="flex flex-col gap-2">
-                  <label
-                    className="text-sm font-semibold text-slate-700"
-                    htmlFor="password"
-                  >
-                    Şifre
-                  </label>
-
-                  <input
-                    required
-                    onChange={handleChange}
-                    className="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#6B8F86] focus:bg-white focus:ring-4 focus:ring-emerald-50"
-                    type="password"
-                    name="password"
-                    id="password"
-                    autoComplete="current-password"
-                  />
-                </div>
-
-                {/* FORGOT PASSWORD */}
-                <div className="-mt-2 flex justify-end">
-                  <a
-                    className="text-xs font-medium text-[#5C7D75] transition-colors hover:text-[#3F5B55] sm:text-sm"
-                    href="/forgot-password"
-                  >
-                    Şifremi unuttum
-                  </a>
-                </div>
-
-                {/* SUBMIT */}
-                <button
-                  type="submit"
-                  className="mt-2 min-h-11 w-full rounded-xl bg-[#3F5B55] px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-900/10 transition duration-200 hover:bg-[#344C47] hover:shadow-xl active:scale-[0.99]"
-                >
-                  Devam
-                </button>
-
-              </form>
-
-              {/* REGISTER */}
-              <div className="mt-7 flex flex-col items-center justify-center gap-1 text-sm sm:flex-row">
-                <p className="text-slate-400">
-                  Hesabın yok mu?
-                </p>
-
-                <a
-                  className="font-semibold text-[#5C7D75] transition-colors hover:text-[#3F5B55]"
-                  href="/register"
-                >
-                  Şimdi kaydol
-                </a>
-              </div>
-
+              {/* LOGIN FORM */}
+              <LoginForm />
             </div>
           </div>
         </div>
