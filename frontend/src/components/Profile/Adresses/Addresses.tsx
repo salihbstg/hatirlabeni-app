@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-import AddressCard from "./AddressCard";
-import AddressForm from "./AddressForm";
+import AddressForm from "./AddressForm/AddressForm";
+import AddressLoading from "./AddressLoading";
+import AddressesList from "./AddressesList";
+import AddressEmptyState from "./AddressEmptyState";
 
 import {
   getAddresses,
@@ -12,24 +14,20 @@ import {
 import type { Address } from "../../../types/User";
 
 const Addresses: React.FC = () => {
+  // State
   const [isAddingAddress, setIsAddingAddress] = useState(false);
-
   const [addresses, setAddresses] = useState<Address[] | null>(null);
-
   const [isEditing, setIsEditing] = useState<number | null>(null);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
-  // Adresleri getir
+  // Fetch addresses
   const fetchAddresses = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
       const data = await getAddresses();
-
       setAddresses(data);
     } catch (error) {
       console.error("Adresler yüklenemedi:", error);
@@ -39,48 +37,42 @@ const Addresses: React.FC = () => {
     }
   };
 
+  // Fetch addresses on mount
   useEffect(() => {
     fetchAddresses();
   }, []);
 
-  // Adres düzenleme
+  // Edit address
   const handleEdit = (id: number) => {
     setIsEditing(id);
     setIsAddingAddress(false);
   };
 
-  // Düzenlemeyi iptal et
+  // Cancel editing
   const handleCancel = () => {
     setIsEditing(null);
   };
 
-  // Adres kaydetme
+  // Save updated address
   const handleSave = async (updatedAddress: Address) => {
     try {
       await updateAddress(updatedAddress.id, updatedAddress);
 
       await fetchAddresses();
-
       setIsEditing(null);
     } catch (error) {
       console.error("Adres güncellenemedi:", error);
     }
   };
 
-  // Yeni adres ekleme
+  // Add new address
   const handleAddAddress = (newAddress: Address) => {
-    setAddresses((prev) => {
-      if (!prev) {
-        return [newAddress];
-      }
-
-      return [...prev, newAddress];
-    });
+    setAddresses((prev) => (prev ? [...prev, newAddress] : [newAddress]));
 
     setIsAddingAddress(false);
   };
 
-  // Adres silme
+  // Delete address
   const handleDelete = async (id: number) => {
     const confirmed = window.confirm(
       "Bu adresi silmek istediğinize emin misiniz?"
@@ -91,11 +83,9 @@ const Addresses: React.FC = () => {
     try {
       await deleteAddress(id);
 
-      setAddresses((prev) => {
-        if (!prev) return prev;
-
-        return prev.filter((address) => address.id !== id);
-      });
+      setAddresses((prev) =>
+        prev ? prev.filter((address) => address.id !== id) : prev
+      );
     } catch (error) {
       console.error("Adres silinemedi:", error);
     }
@@ -155,14 +145,7 @@ const Addresses: React.FC = () => {
       )}
 
       {/* Loading */}
-      {isLoading && (
-        <div className="flex min-h-[140px] items-center justify-center rounded-xl border border-gray-200 bg-white">
-          <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#3F5B55] border-t-transparent" />
-            Adresler yükleniyor...
-          </div>
-        </div>
-      )}
+      {isLoading && <AddressLoading />}
 
       {/* Error */}
       {!isLoading && error && (
@@ -180,53 +163,21 @@ const Addresses: React.FC = () => {
       )}
 
       {/* Empty State */}
-      {!isLoading &&
-        !error &&
-        addresses &&
-        addresses.length === 0 && (
-          <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-dashed border-[#ded5c5] bg-[#fcfaf5] px-4 py-8 text-center">
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-[#e9e0d1] bg-[#f7f2e8]">
-              <svg
-                className="h-5 w-5 text-[#a45f2a]"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M12 5V19M5 12H19"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-
-            <h3 className="text-sm font-semibold text-[#3f493e]">
-              Henüz kayıtlı adresin yok
-            </h3>
-
-            <p className="mt-1 max-w-xs text-xs leading-5 text-gray-500">
-              Siparişlerinde kullanmak için yeni bir adres ekleyebilirsin.
-            </p>
-          </div>
-        )}
+      {!isLoading && !error && addresses?.length === 0 && (
+        <AddressEmptyState />
+      )}
 
       {/* Address List */}
       {!isLoading && !error && addresses && addresses.length > 0 && (
-        <div className="w-full min-w-0 space-y-3">
-          {addresses.map((address) => (
-            <AddressCard
-              key={address.id}
-              address={address}
-              isEditing={isEditing === address.id}
-              setAddresses={setAddresses}
-              onEdit={() => handleEdit(address.id)}
-              onSave={() => handleSave(address)}
-              onCancel={handleCancel}
-              onDelete={() => handleDelete(address.id)}
-            />
-          ))}
-        </div>
+        <AddressesList
+          addresses={addresses}
+          isEditing={isEditing}
+          setAddresses={setAddresses}
+          onEdit={handleEdit}
+          onSave={handleSave}
+          onCancel={handleCancel}
+          onDelete={handleDelete}
+        />
       )}
     </div>
   );

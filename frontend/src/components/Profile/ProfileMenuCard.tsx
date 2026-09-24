@@ -15,24 +15,16 @@ const ProfileMenuCard = ({
     <button
       type="button"
       onClick={onClick}
+      aria-current={active ? "page" : undefined}
       className={`
         group relative flex w-full flex-col items-start
-        px-4 py-3
-        text-left text-[#2F302B]
+        px-4 py-3 text-left text-[#2F302B]
         transition-all duration-200
-
-        after:absolute
-        after:right-0
-        after:top-1/2
-        after:h-0
-        after:w-[3px]
-        after:-translate-y-1/2
+        after:absolute after:right-0 after:top-1/2
+        after:h-0 after:w-[3px] after:-translate-y-1/2
         after:bg-[#76513D]
-        after:transition-all
-        after:duration-300
-
+        after:transition-all after:duration-300
         hover:bg-[#E7DED0]
-
         ${
           active
             ? "bg-[#D3C0AA] after:h-3/4"

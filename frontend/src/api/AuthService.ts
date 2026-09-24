@@ -1,55 +1,121 @@
 import type {
   LoginRequest,
+  LoginResponse,
   RegisterForm,
   RegisterResponse,
   ForgotPasswordRequest,
   ResetPasswordRequest,
   VerifyMailRequest,
-  ChangePasswordRequest
+  ChangePasswordRequest,
+  ChangeEmailRequest,
+  VerifyChangeEmailRequest,
+  RefreshResponse,
+  MeResponse,
 } from "../types/auth";
+
 import api from "./ApiClient";
-export const register = async (formData: RegisterForm) => {
-  const response = await api.post<RegisterResponse>("/auth/register", formData);
+
+// ─── Authentication ──────────────────────────────────────
+
+export const register = async (
+  formData: RegisterForm,
+): Promise<RegisterResponse> => {
+  const response = await api.post<RegisterResponse>(
+    "/auth/register",
+    formData,
+  );
+
   return response.data;
 };
 
-export const login = async (formData: LoginRequest) => {
-  const response = await api.post<LoginRequest>("/auth/login", formData);
+export const login = async (
+  formData: LoginRequest,
+): Promise<LoginResponse> => {
+  const response = await api.post<LoginResponse>(
+    "/auth/login",
+    formData,
+  );
+
   return response.data;
 };
-export const refresh = async () => {
-  const response = await api.post("/auth/refresh");
+
+export const refresh = async (): Promise<RefreshResponse> => {
+  const response = await api.post<RefreshResponse>(
+    "/auth/refresh",
+  );
+
   return response.data;
 };
-export const logout = async () => {
+
+export const logout = async (): Promise<void> => {
   await api.post("/auth/logout");
 };
 
-export const me = async () => {
-  const response = await api.get("/users/me");
+// ─── Current User ────────────────────────────────────────
+
+export const me = async (): Promise<MeResponse> => {
+  const response = await api.get<MeResponse>("/users/me");
+
   return response.data;
 };
 
+// ─── Password Management ──────────────────────────────────
+
 export const forgotPassword = async (
   forgotPasswordRequest: ForgotPasswordRequest,
-) => {
-  await api.post("/auth/forgot-password", forgotPasswordRequest);
+): Promise<void> => {
+  await api.post(
+    "/auth/forgot-password",
+    forgotPasswordRequest,
+  );
 };
 
 export const resetPassword = async (
   resetPasswordRequest: ResetPasswordRequest,
-) => {
-  await api.post("/auth/reset-password", resetPasswordRequest);
+): Promise<void> => {
+  await api.post(
+    "/auth/reset-password",
+    resetPasswordRequest,
+  );
 };
 
-export const sendMailActivationLink = async()=>{
-  await api.post("/auth/mail-activation")
-}
+export const changePassword = async (
+  changePasswordRequest: ChangePasswordRequest,
+): Promise<void> => {
+  await api.patch(
+    "/auth/change-password",
+    changePasswordRequest,
+  );
+};
 
-export const verifyMail = async(token:VerifyMailRequest)=>{
-  await api.post("/auth/mail-verify",token)
-}
+// ─── Mail Activation ─────────────────────────────────────
 
-export const changePassword = async (changePasswordRequest:ChangePasswordRequest)=>{
-  await api.patch("/auth/change-password",changePasswordRequest);
-}
+export const sendMailActivationLink = async (): Promise<void> => {
+  await api.post("/auth/mail-activation");
+};
+
+export const verifyMail = async (
+  token: VerifyMailRequest,
+): Promise<void> => {
+  await api.post("/auth/mail-verify", token);
+};
+
+// ─── Email Change ────────────────────────────────────────
+
+export const sendChangeEmailLink = async (
+  changeEmailRequest: ChangeEmailRequest,
+): Promise<void> => {
+  await api.post(
+    "/auth/change-email",
+    changeEmailRequest,
+  );
+};
+
+export const verifyChangeMail = async (
+  verifyChangeEmailRequest: VerifyChangeEmailRequest,
+): Promise<void> => {
+  await api.post(
+    "/auth/verify-change-email",
+    verifyChangeEmailRequest,
+  );
+};

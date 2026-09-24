@@ -77,3 +77,12 @@ export type ChangePasswordRequest={
   currentPassword:String,
   newPassword:String
 }
+
+export type ChangeEmailRequest ={
+  newEmail: string;
+  password: string;
+}
+
+export type VerifyChangeEmailRequest ={
+  token: string;
+}

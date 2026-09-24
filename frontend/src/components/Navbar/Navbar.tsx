@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
 import UserMenu from "./UserMenu";
-import CategoryMenuDesktop from "./CategoryMenuDesktop";
-import CategoryMenuMobile from "./CategoryMenuMobile";
+import CategoryMenuDesktop from "./CategoryMenu/CategoryMenuDesktop";
+import CategoryMenuMobile from "./CategoryMenu/CategoryMenuMobile";
 
 import logo from "../../assets/Logo.png";
 

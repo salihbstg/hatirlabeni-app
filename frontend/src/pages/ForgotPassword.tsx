@@ -1,44 +1,59 @@
 import { useState } from "react";
-import { forgotPassword} from "../api/AuthService";
+
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+
+import { forgotPassword } from "../api/AuthService";
+
 const ForgotPassword = () => {
-  const [identifier, setIdentifier] = useState<string>("");
-  const navigate=useNavigate();
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const [identifier, setIdentifier] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (
+    event: React.SubmitEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
+
     try {
-      await forgotPassword({
-        identifier: identifier,
-      });
-      toast.success("Şifre sıfırlama bağlantısı kayıtlı mail adresinize gönderilmiştir, işleminize mail üzerinden devam edebilirsiniz.")
-      setTimeout(()=>{
+      await forgotPassword({ identifier });
+
+      toast.success(
+        "Şifre sıfırlama bağlantısı kayıtlı mail adresinize gönderilmiştir, işleminize mail üzerinden devam edebilirsiniz.",
+      );
+
+      setTimeout(() => {
         navigate("/");
-      },2000);
-    } catch (error) {
-      console.log(error);
+      }, 2000);
+    } catch (error: unknown) {
+      console.error("Şifre sıfırlama isteği başarısız:", error);
+
+      toast.error(
+        "Şifre sıfırlama isteği gönderilemedi. Lütfen tekrar deneyin.",
+      );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 sm:p-10">
+        <div className="rounded-2xl bg-white p-8 shadow-xl sm:p-10">
           {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100">
-              <span className="text-6xl">🔐</span>
+          <div className="mb-6 flex justify-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
+              <span className="text-4xl" aria-hidden="true">
+                🔐
+              </span>
             </div>
           </div>
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+          <div className="mb-8 text-center">
+            <h1 className="mb-3 text-2xl font-bold text-gray-900 sm:text-3xl">
               Şifreni mi unuttun?
             </h1>
 
-            <p className="text-sm sm:text-base text-gray-500 leading-relaxed">
+            <p className="text-sm leading-relaxed text-gray-500 sm:text-base">
               Hesabına kayıtlı e-posta adresini gir. Sana şifre sıfırlama
               bağlantısı göndereceğiz.
             </p>
@@ -46,11 +61,10 @@ const ForgotPassword = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username / Email */}
             <div>
               <label
                 htmlFor="identifier"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="mb-2 block text-sm font-medium text-gray-700"
               >
                 Kullanıcı adı veya e-posta
               </label>
@@ -64,20 +78,13 @@ const ForgotPassword = () => {
                 autoComplete="username"
                 required
                 className="
-        w-full
-        px-4
-        py-3
-        rounded-lg
-        border
-        border-gray-300
-        text-gray-900
-        placeholder-gray-400
-        outline-none
-        transition
-        focus:border-indigo-500
-        focus:ring-2
-        focus:ring-indigo-100
-      "
+                  w-full rounded-lg border border-gray-300
+                  px-4 py-3 text-gray-900
+                  outline-none transition
+                  placeholder:text-gray-400
+                  focus:border-indigo-500
+                  focus:ring-2 focus:ring-indigo-100
+                "
               />
             </div>
 
@@ -85,21 +92,13 @@ const ForgotPassword = () => {
             <button
               type="submit"
               className="
-      w-full
-      py-3
-      px-4
-      rounded-lg
-      bg-indigo-600
-      text-white
-      font-medium
-      transition
-      hover:bg-indigo-700
-      active:scale-[0.98]
-      focus:outline-none
-      focus:ring-2
-      focus:ring-indigo-500
-      focus:ring-offset-2
-    "
+                w-full rounded-lg bg-indigo-600
+                px-4 py-3 font-medium text-white
+                transition hover:bg-indigo-700
+                active:scale-[0.98]
+                focus:outline-none focus:ring-2
+                focus:ring-indigo-500 focus:ring-offset-2
+              "
             >
               Şifre Sıfırlama Bağlantısı Gönder
             </button>
@@ -107,17 +106,12 @@ const ForgotPassword = () => {
 
           {/* Back */}
           <div className="mt-6 text-center">
-            <a
-              href="/login"
-              className="
-                text-sm
-                text-gray-500
-                transition
-                hover:text-indigo-600
-              "
+            <Link
+              to="/login"
+              className="text-sm text-gray-500 transition hover:text-indigo-600"
             >
               ← Giriş sayfasına dön
-            </a>
+            </Link>
           </div>
         </div>
       </div>

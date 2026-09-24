@@ -12,6 +12,36 @@ const ProfileMenu = ({
   onMenuClick,
   onLogout,
 }: ProfileMenuProps) => {
+  const renderMenuItems = () =>
+    profileMenuItems.map((item) => {
+      const isActive = activeMenu === item.id;
+
+      return (
+        <div
+          key={item.id}
+          className={`rounded-xl transition-colors duration-200 ${
+            isActive ? "bg-[#edf1e8]" : "hover:bg-[#f8f5ee]"
+          }`}
+        >
+          <ProfileMenuCard
+            title={item.title}
+            description={item.description}
+            active={isActive}
+            onClick={() => onMenuClick(item.id)}
+          />
+        </div>
+      );
+    });
+
+  const renderLogoutCard = () => (
+    <ProfileMenuCard
+      title="Çıkış yap"
+      description="Hesabınızdan güvenle çıkış yapın."
+      active={false}
+      onClick={onLogout}
+    />
+  );
+
   return (
     <>
       {/* ================= MOBILE MENU ================= */}
@@ -26,10 +56,7 @@ const ProfileMenu = ({
           </h2>
         </div>
 
-        <div
-          className="flex snap-x snap-mandatory gap-3 overflow-x-auto
-            pb-4 scrollbar-hide"
-        >
+        <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 scrollbar-hide">
           {profileMenuItems.map((item) => (
             <div
               key={item.id}
@@ -44,14 +71,8 @@ const ProfileMenu = ({
             </div>
           ))}
 
-          {/* Logout */}
           <div className="w-[240px] shrink-0 snap-start">
-            <ProfileMenuCard
-              title="Çıkış yap"
-              description="Hesabınızdan güvenle çıkış yapın."
-              active={false}
-              onClick={onLogout}
-            />
+            {renderLogoutCard()}
           </div>
         </div>
       </div>
@@ -59,17 +80,10 @@ const ProfileMenu = ({
       {/* ================= DESKTOP SIDEBAR ================= */}
       <aside
         aria-label="Profil menüsü"
-        className="hidden min-h-0 w-full shrink-0 md:flex
-          md:h-[calc(100vh-140px)] md:w-[32%]
-          lg:w-[30%] xl:w-[28%]"
+        className="hidden min-h-0 w-full shrink-0 md:flex md:h-[calc(100vh-140px)] md:w-[32%] lg:w-[30%] xl:w-[28%]"
       >
-        <div
-          className="flex h-full min-h-0 w-full flex-col overflow-hidden
-            rounded-[24px] border border-[#e8e0d2]
-            bg-[#fffdf8]
-            shadow-[0_8px_30px_rgba(63,52,35,0.055)]"
-        >
-          {/* ================= SIDEBAR HEADER ================= */}
+        <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-[24px] border border-[#e8e0d2] bg-[#fffdf8] shadow-[0_8px_30px_rgba(63,52,35,0.055)]">
+          {/* Sidebar Header */}
           <div className="shrink-0 border-b border-[#eee7da] bg-[#f7f3ea] px-6 py-7 lg:px-7">
             <div className="mb-3 flex items-center gap-2.5">
               <span className="h-px w-7 bg-[#a45f2a]" />
@@ -88,50 +102,29 @@ const ProfileMenu = ({
             </p>
           </div>
 
-          {/* ================= SCROLLABLE MENU ITEMS ================= */}
+          {/* Scrollable Menu */}
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-4 lg:p-5">
             <p className="mb-3 shrink-0 px-3 pt-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#aaa08e]">
               Hesap menüsü
             </p>
 
             <div className="flex flex-col gap-2">
-              {profileMenuItems.map((item) => (
-                <div
-                  key={item.id}
-                  className={`rounded-xl transition-colors duration-200 ${
-                    activeMenu === item.id
-                      ? "bg-[#edf1e8]"
-                      : "hover:bg-[#f8f5ee]"
-                  }`}
-                >
-                  <ProfileMenuCard
-                    title={item.title}
-                    description={item.description}
-                    active={activeMenu === item.id}
-                    onClick={() => onMenuClick(item.id)}
-                  />
-                </div>
-              ))}
+              {renderMenuItems()}
             </div>
           </div>
 
-          {/* ================= LOGOUT ================= */}
+          {/* Logout */}
           <div className="mx-5 shrink-0 border-t border-[#eee7da] py-4">
             <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#b4a091]">
               Oturum
             </p>
 
             <div className="rounded-xl transition-colors duration-200 hover:bg-[#fbefeb]">
-              <ProfileMenuCard
-                title="Çıkış yap"
-                description="Hesabınızdan güvenle çıkış yapın."
-                active={false}
-                onClick={onLogout}
-              />
+              {renderLogoutCard()}
             </div>
           </div>
 
-          {/* ================= SIDEBAR FOOTER ================= */}
+          {/* Sidebar Footer */}
           <div className="shrink-0 border-t border-[#eee7da] bg-[#fcfaf5] px-5 py-4">
             <p className="text-center text-xs tracking-wide text-[#a49a88]">
               Geçmişten bugüne, her anı sakla.

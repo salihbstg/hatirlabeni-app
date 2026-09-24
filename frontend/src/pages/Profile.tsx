@@ -8,7 +8,7 @@ import { AuthContext } from "../context/AuthContext";
 
 import Navbar from "../components/Navbar/Navbar";
 import ProfileMenu from "../components/Profile/ProfileMenu";
-import ProfileContent from "../components/Profile/ProfileContent";
+import ProfileContent from "../components/Profile/ProfileContent/ProfileContent";
 
 import type { MeResponse } from "../types/auth";
 

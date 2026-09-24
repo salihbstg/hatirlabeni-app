@@ -1,25 +1,30 @@
 import { Link } from "react-router-dom";
 
 interface ActivationResultProps {
+  // Aktivasyon işleminin sonucuna göre gösterilecek ekranı belirler.
   status: "success" | "already-activated" | "error";
 }
 
 const ActivationResult = ({ status }: ActivationResultProps) => {
+  // Aktivasyon başarısız mı, yoksa kullanıcı daha önce doğrulama yapmış mı?
   const isError = status === "error";
   const isAlreadyActivated = status === "already-activated";
 
+  // Aktivasyon sonucuna göre başlık metnini belirler.
   const title = isError
     ? "Mail Doğrulama Başarısız"
     : isAlreadyActivated
       ? "Mail Adresiniz Zaten Doğrulanmış"
       : "Mail Adresiniz Doğrulandı";
 
+  // Kullanıcıya aktivasyon sonucuyla ilgili açıklama gösterir.
   const description = isError
     ? "Mail adresiniz doğrulanamadı. Aktivasyon bağlantısı geçersiz veya süresi dolmuş olabilir."
     : isAlreadyActivated
       ? "Mail adresiniz daha önce doğrulanmış. Hesabınızı kullanmaya devam edebilirsiniz."
       : "Mail adresiniz başarıyla doğrulandı. Artık hesabınızı kullanmaya devam edebilirsiniz.";
 
+  // Hata durumunda kırmızı, başarılı veya önceden doğrulanmış durumda yeşil ikon kullanır.
   const iconColor = isError
     ? "bg-red-100 text-red-600"
     : "bg-green-100 text-green-600";
@@ -27,6 +32,7 @@ const ActivationResult = ({ status }: ActivationResultProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f7f5f0] px-4">
       <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm px-8 py-10 text-center">
+        {/* Aktivasyon sonucuna göre renk ve ikon gösterir. */}
         <div
           className={`mx-auto mb-6 flex items-center justify-center w-20 h-20 rounded-full ${iconColor}`}
         >
@@ -38,6 +44,7 @@ const ActivationResult = ({ status }: ActivationResultProps) => {
             stroke="currentColor"
             strokeWidth={2}
           >
+            {/* Hata durumunda çarpı, diğer durumlarda onay işareti gösterilir. */}
             {isError ? (
               <path
                 strokeLinecap="round"
@@ -54,14 +61,17 @@ const ActivationResult = ({ status }: ActivationResultProps) => {
           </svg>
         </div>
 
+        {/* Aktivasyon sonucunun başlığını gösterir. */}
         <h1 className="text-2xl font-bold text-gray-800 mb-3">
           {title}
         </h1>
 
+        {/* Kullanıcıya aktivasyon işleminin sonucu hakkında bilgi verir. */}
         <p className="text-gray-500 text-sm leading-6 mb-8">
           {description}
         </p>
 
+        {/* Kullanıcının ana sayfaya geri dönmesini sağlar. */}
         <Link
           to="/"
           className="inline-flex items-center justify-center w-full bg-black text-white font-semibold rounded-lg px-5 py-3 hover:bg-gray-800 transition"

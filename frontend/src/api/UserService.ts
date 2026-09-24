@@ -1,28 +1,34 @@
 import api from "./ApiClient";
 import type { Address, SaveAddress } from "../types/User";
 
-export const saveAddress = async (formData:SaveAddress) => {
-  const response = await api.post("/address", formData);
-  return response.data;
-}
+// ─── Address Management ──────────────────────────────────
 
 export const getAddresses = async (): Promise<Address[]> => {
-  const response = await api.get("/address");
-  return response.data;
-}
+  const response = await api.get<Address[]>("/address");
 
-export const deleteAddress = async (id: Number) => {
-  await api.delete(`/address?addressId=${id}`);
-}
+  return response.data;
+};
+
+export const saveAddress = async (
+  formData: SaveAddress,
+): Promise<Address> => {
+  const response = await api.post<Address>("/address", formData);
+
+  return response.data;
+};
 
 export const updateAddress = async (
   id: number,
-  address: SaveAddress
+  address: SaveAddress,
 ): Promise<Address> => {
-  const response = await api.put(
+  const response = await api.put<Address>(
     `/address?addressId=${id}`,
-    address
+    address,
   );
 
   return response.data;
+};
+
+export const deleteAddress = async (id: number): Promise<void> => {
+  await api.delete(`/address?addressId=${id}`);
 };
