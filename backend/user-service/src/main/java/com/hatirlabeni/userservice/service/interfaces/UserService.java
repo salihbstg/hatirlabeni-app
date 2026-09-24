@@ -1,7 +1,9 @@
 package com.hatirlabeni.userservice.service.interfaces;
 
-import com.hatirlabeni.userservice.dtos.*;
-import org.jspecify.annotations.Nullable;
+import com.hatirlabeni.userservice.dtos.user.CreateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UpdateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UserProfileResponse;
+import com.hatirlabeni.userservice.dtos.user.UserResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

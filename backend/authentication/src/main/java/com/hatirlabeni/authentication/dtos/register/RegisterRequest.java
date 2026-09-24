@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.dtos;
+package com.hatirlabeni.authentication.dtos.register;
 
 import jakarta.validation.constraints.*;
 

@@ -1,4 +1,4 @@
-package com.hatirlabeni.userservice.exception;
+package com.hatirlabeni.userservice.exception.address;
 
 public class AddressNotFoundException extends RuntimeException {
     public AddressNotFoundException() {

@@ -1,4 +1,4 @@
-package com.hatirlabeni.userservice.dtos;
+package com.hatirlabeni.userservice.enums;
 
 public enum Role {
     ROOT,ADMIN,USER

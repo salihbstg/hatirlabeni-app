@@ -1,11 +1,16 @@
 package com.hatirlabeni.userservice.service.impl;
 
-import com.hatirlabeni.userservice.dtos.*;
+import com.hatirlabeni.userservice.dtos.feign.AuthUserResponse;
+import com.hatirlabeni.userservice.dtos.user.CreateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UpdateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UserProfileResponse;
+import com.hatirlabeni.userservice.dtos.user.UserResponse;
 import com.hatirlabeni.userservice.entity.User;
-import com.hatirlabeni.userservice.exception.AdminStatusChangeNotAllowedException;
-import com.hatirlabeni.userservice.exception.DuplicateUserException;
-import com.hatirlabeni.userservice.exception.RootIsImmutableException;
-import com.hatirlabeni.userservice.exception.UserNotFoundException;
+import com.hatirlabeni.userservice.enums.Role;
+import com.hatirlabeni.userservice.exception.admin.AdminStatusChangeNotAllowedException;
+import com.hatirlabeni.userservice.exception.user.DuplicateUserException;
+import com.hatirlabeni.userservice.exception.admin.RootIsImmutableException;
+import com.hatirlabeni.userservice.exception.user.UserNotFoundException;
 import com.hatirlabeni.userservice.feign.AuthFeign;
 import com.hatirlabeni.userservice.mapper.UserMapper;
 import com.hatirlabeni.userservice.repository.UserRepository;

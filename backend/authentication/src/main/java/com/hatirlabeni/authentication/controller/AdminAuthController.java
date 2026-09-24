@@ -1,6 +1,6 @@
 package com.hatirlabeni.authentication.controller;
 
-import com.hatirlabeni.authentication.dtos.AuthUserResponse;
+import com.hatirlabeni.authentication.dtos.user.AuthUserResponse;
 import com.hatirlabeni.authentication.feign.UserServiceFeign;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,16 +35,16 @@ public class AdminAuthController {
 
     @Operation(
             summary = "Kullanıcıyı sil",
-            description = "UUID bilgisi verilen kullanıcının authentication ve kullanıcı kayıtlarını siler."
+            description = "Belirtilen UUID'ye sahip kullanıcının User Service ve Authentication Service kayıtlarını siler."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Kullanıcı başarıyla silindi."
+                    description = "Kullanıcı kayıtları başarıyla silindi."
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı."
+                    description = "Kimlik doğrulaması başarısız veya erişim token'ı geçersiz."
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -52,7 +52,7 @@ public class AdminAuthController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Kullanıcı bulunamadı."
+                    description = "Belirtilen UUID'ye sahip kullanıcı bulunamadı."
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -64,7 +64,7 @@ public class AdminAuthController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> deleteUser(
             @Parameter(
-                    description = "Silinecek kullanıcının UUID'si",
+                    description = "Silinecek kullanıcının UUID değeri",
                     required = true
             )
             @PathVariable UUID uuid
@@ -76,17 +76,17 @@ public class AdminAuthController {
     }
 
     @Operation(
-            summary = "Email adresinden kullanıcı UUID'sini getir",
-            description = "Verilen email adresine ait kullanıcının UUID bilgisini getirir."
+            summary = "E-posta adresinden kullanıcı bilgilerini getir",
+            description = "Belirtilen e-posta adresine sahip kullanıcının Auth Service üzerindeki UUID ve kimlik bilgilerini getirir."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Kullanıcı UUID'si başarıyla getirildi."
+                    description = "Kullanıcı bilgileri başarıyla getirildi."
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı."
+                    description = "Kimlik doğrulaması başarısız veya erişim token'ı geçersiz."
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -94,7 +94,7 @@ public class AdminAuthController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Email adresine ait kullanıcı bulunamadı."
+                    description = "Belirtilen e-posta adresine sahip kullanıcı bulunamadı."
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -106,7 +106,7 @@ public class AdminAuthController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<AuthUserResponse> getAuthUserByEmail(
             @Parameter(
-                    description = "Kullanıcının email adresi",
+                    description = "Aranacak kullanıcının e-posta adresi",
                     required = true
             )
             @RequestParam("email") String email

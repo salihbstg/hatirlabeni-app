@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.exception;
+package com.hatirlabeni.authentication.exception.feign;
 
 public class UserServiceException extends RuntimeException {
     public UserServiceException(String message,Throwable cause) {

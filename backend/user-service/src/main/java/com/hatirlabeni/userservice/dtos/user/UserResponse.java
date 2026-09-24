@@ -1,4 +1,4 @@
-package com.hatirlabeni.userservice.dtos;
+package com.hatirlabeni.userservice.dtos.user;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

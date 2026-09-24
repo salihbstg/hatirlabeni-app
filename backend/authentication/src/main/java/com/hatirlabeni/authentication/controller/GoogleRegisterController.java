@@ -1,8 +1,8 @@
 package com.hatirlabeni.authentication.controller;
 
-import com.hatirlabeni.authentication.dtos.GoogleRegisterInfoResponse;
-import com.hatirlabeni.authentication.dtos.GoogleRegisterRequest;
-import com.hatirlabeni.authentication.dtos.LoginResponse;
+import com.hatirlabeni.authentication.dtos.google.GoogleRegisterInfoResponse;
+import com.hatirlabeni.authentication.dtos.google.GoogleRegisterRequest;
+import com.hatirlabeni.authentication.dtos.login.LoginResponse;
 import com.hatirlabeni.authentication.service.interfaces.AuthService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

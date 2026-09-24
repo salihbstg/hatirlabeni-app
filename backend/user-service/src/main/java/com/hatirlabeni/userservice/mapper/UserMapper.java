@@ -1,8 +1,8 @@
 package com.hatirlabeni.userservice.mapper;
 
-import com.hatirlabeni.userservice.dtos.CreateUserRequest;
-import com.hatirlabeni.userservice.dtos.UpdateUserRequest;
-import com.hatirlabeni.userservice.dtos.UserResponse;
+import com.hatirlabeni.userservice.dtos.user.CreateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UpdateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UserResponse;
 import com.hatirlabeni.userservice.entity.User;
 import org.mapstruct.*;
 

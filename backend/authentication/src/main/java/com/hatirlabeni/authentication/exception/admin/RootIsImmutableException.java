@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.exception;
+package com.hatirlabeni.authentication.exception.admin;
 
 public class RootIsImmutableException extends RuntimeException {
     public RootIsImmutableException() {

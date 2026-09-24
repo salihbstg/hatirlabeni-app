@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.exception;
+package com.hatirlabeni.authentication.exception.user;
 
 public class UserNotActiveException extends RuntimeException {
     public UserNotActiveException() {

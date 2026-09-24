@@ -1,11 +1,9 @@
 package com.hatirlabeni.authentication.feign;
 
 import com.hatirlabeni.authentication.config.FeignConfig;
-import com.hatirlabeni.authentication.dtos.CreateUserRequest;
-import com.hatirlabeni.authentication.dtos.UserResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import com.hatirlabeni.authentication.dtos.user.CreateUserRequest;
+import com.hatirlabeni.authentication.dtos.user.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package com.hatirlabeni.userservice.feign;
 
 import com.hatirlabeni.userservice.config.FeignConfig;
-import com.hatirlabeni.userservice.dtos.AuthUserResponse;
+import com.hatirlabeni.userservice.dtos.feign.AuthUserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

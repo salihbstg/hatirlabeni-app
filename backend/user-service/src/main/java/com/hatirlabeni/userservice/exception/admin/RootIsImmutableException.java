@@ -1,4 +1,4 @@
-package com.hatirlabeni.userservice.exception;
+package com.hatirlabeni.userservice.exception.admin;
 
 public class RootIsImmutableException extends RuntimeException {
     public RootIsImmutableException() {

@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.exception;
+package com.hatirlabeni.authentication.exception.admin;
 
 public class AlreadyAdminException extends RuntimeException {
     public AlreadyAdminException() {

@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.dtos;
+package com.hatirlabeni.authentication.dtos.google;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

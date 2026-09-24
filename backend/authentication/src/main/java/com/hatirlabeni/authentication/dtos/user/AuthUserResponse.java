@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.dtos.entity;
+package com.hatirlabeni.authentication.dtos.user;
 
 import com.hatirlabeni.authentication.enums.Role;
 

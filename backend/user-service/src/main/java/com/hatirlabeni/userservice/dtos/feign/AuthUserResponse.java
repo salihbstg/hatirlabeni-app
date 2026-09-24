@@ -1,4 +1,6 @@
-package com.hatirlabeni.userservice.dtos;
+package com.hatirlabeni.userservice.dtos.feign;
+
+import com.hatirlabeni.userservice.enums.Role;
 
 import java.util.UUID;
 

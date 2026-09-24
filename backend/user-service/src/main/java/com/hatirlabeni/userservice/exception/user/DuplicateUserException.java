@@ -1,4 +1,4 @@
-package com.hatirlabeni.userservice.exception;
+package com.hatirlabeni.userservice.exception.user;
 
 public class DuplicateUserException extends RuntimeException{
     public DuplicateUserException(String message) {

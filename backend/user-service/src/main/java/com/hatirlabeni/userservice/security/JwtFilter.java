@@ -1,6 +1,6 @@
 package com.hatirlabeni.userservice.security;
 
-import com.hatirlabeni.userservice.dtos.CustomUserDetails;
+import com.hatirlabeni.userservice.dtos.user.CustomUserDetails;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

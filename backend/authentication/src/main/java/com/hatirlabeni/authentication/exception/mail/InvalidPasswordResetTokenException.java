@@ -1,4 +1,4 @@
-package com.hatirlabeni.authentication.exception;
+package com.hatirlabeni.authentication.exception.mail;
 
 public class InvalidPasswordResetTokenException extends RuntimeException {
     public InvalidPasswordResetTokenException(String message) {

@@ -1,7 +1,7 @@
 package com.hatirlabeni.userservice.controller;
 
-import com.hatirlabeni.userservice.dtos.UpdateUserRequest;
-import com.hatirlabeni.userservice.dtos.UserProfileResponse;
+import com.hatirlabeni.userservice.dtos.user.UpdateUserRequest;
+import com.hatirlabeni.userservice.dtos.user.UserProfileResponse;
 import com.hatirlabeni.userservice.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/v1/users/admin")
+@RequestMapping("/api/v1/users/admin")
 @RequiredArgsConstructor
 @Tag(
         name = "Admin User Management",
@@ -32,306 +32,173 @@ public class AdminUserController {
 
     private final UserService userService;
 
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ROOT')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Kullanıcı sil",
-            description = "UUID bilgisi verilen kullanıcıyı siler."
+            description = "UUID bilgisi verilen kullanıcıyı siler. Bu işlem ROOT yetkisi gerektirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204",
-                    description = "Kullanıcı başarıyla silindi."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "204", description = "Kullanıcı başarıyla silindi."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ROOT yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content)
     })
-    @PreAuthorize("hasRole('ROOT')")
-    @DeleteMapping("/{uuid}")
-    @SecurityRequirement(name = "bearerAuth")
-    ResponseEntity<Void> deleteUser(
-            @Parameter(
-                    description = "Silinecek kullanıcının UUID'si",
-                    required = true
-            )
-            @PathVariable("uuid") UUID uuid
+    public ResponseEntity<Void> deleteUser(
+            @Parameter(description = "Silinecek kullanıcının UUID'si", required = true)
+            @PathVariable UUID uuid
     ) {
         userService.deleteUser(uuid);
+
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/email")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Email ile kullanıcı bul",
             description = "Email adresine göre kullanıcı bilgilerini getirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcı başarıyla bulundu."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcı başarıyla bulundu."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content)
     })
-    @GetMapping("/email")
-    @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> getUserByEmail(
-            @Parameter(
-                    description = "Kullanıcının email adresi",
-                    required = true
-            )
-            @RequestParam(name = "email") String email
+            @Parameter(description = "Kullanıcının email adresi", required = true)
+            @RequestParam String email
     ) {
         return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
+    @GetMapping("/national-id/{nationalId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "T.C. kimlik numarası ile kullanıcı bul",
             description = "T.C. kimlik numarasına göre kullanıcı bilgilerini getirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcı başarıyla bulundu."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcı başarıyla bulundu."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content)
     })
-    @GetMapping("/national-id/{nationalId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> getUserByNationalId(
-            @Parameter(
-                    description = "Kullanıcının 11 haneli T.C. kimlik numarası",
-                    required = true
-            )
-            @PathVariable(name = "nationalId") String nationalId
+            @Parameter(description = "Kullanıcının 11 haneli T.C. kimlik numarası", required = true)
+            @PathVariable String nationalId
     ) {
         return ResponseEntity.ok(userService.getUserByNationalId(nationalId));
     }
 
+    @GetMapping("/phone/{phoneNumber}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Telefon numarası ile kullanıcı bul",
             description = "Telefon numarasına göre kullanıcı bilgilerini getirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcı başarıyla bulundu."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcı başarıyla bulundu."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content)
     })
-    @GetMapping("/phone/{phoneNumber}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> getUserByPhoneNumber(
-            @Parameter(
-                    description = "Kullanıcının telefon numarası",
-                    required = true
-            )
-            @PathVariable(name = "phoneNumber") String phoneNumber
+            @Parameter(description = "Kullanıcının telefon numarası", required = true)
+            @PathVariable String phoneNumber
     ) {
         return ResponseEntity.ok(userService.getUserByPhoneNumber(phoneNumber));
     }
 
+    @GetMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "UUID ile kullanıcı bul",
             description = "UUID bilgisine göre kullanıcı bilgilerini getirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcı başarıyla bulundu."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcı başarıyla bulundu."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content)
     })
-    @GetMapping("/{uuid}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> getUserByUuid(
-            @Parameter(
-                    description = "Kullanıcının UUID'si",
-                    required = true
-            )
-            @PathVariable(name = "uuid") UUID uuid
+            @Parameter(description = "Kullanıcının UUID'si", required = true)
+            @PathVariable UUID uuid
     ) {
         return ResponseEntity.ok(userService.getUserByUuid(uuid));
     }
 
+    @PutMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Kullanıcı bilgilerini güncelle",
             description = "UUID bilgisi verilen kullanıcının bilgilerini admin yetkisiyle günceller."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcı bilgileri başarıyla güncellendi."
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Gönderilen bilgiler geçersiz.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "Güncellenmek istenen bilgiler başka bir kullanıcıya ait.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Sunucu tarafında beklenmeyen bir hata oluştu.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcı bilgileri başarıyla güncellendi."),
+            @ApiResponse(responseCode = "400", description = "Gönderilen bilgiler geçersiz.", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Güncellenmek istenen bilgiler başka bir kullanıcıya ait.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Sunucu tarafında beklenmeyen bir hata oluştu.", content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{uuid}")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> updateUser(
-            @Parameter(
-                    description = "Güncellenecek kullanıcının UUID'si",
-                    required = true
-            )
-            @PathVariable(name = "uuid") UUID uuid,
-            @Valid @RequestBody UpdateUserRequest updateUserRequest
+            @Parameter(description = "Güncellenecek kullanıcının UUID'si", required = true)
+            @PathVariable UUID uuid,
+            @Valid @RequestBody UpdateUserRequest request
     ) {
         return ResponseEntity.ok(
-                userService.updateUserByUUIDForAdmin(
-                        uuid,
-                        updateUserRequest
-                )
+                userService.updateUserByUUIDForAdmin(uuid, request)
         );
     }
 
+    @PutMapping("/{uuid}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     @Operation(
             summary = "Kullanıcının aktiflik durumunu değiştir",
-            description = "UUID bilgisi verilen kullanıcının aktiflik durumunu aktiften pasife veya pasiften aktife değiştirir."
+            description = "UUID bilgisi verilen kullanıcının aktiflik durumunu tersine çevirir."
     )
     @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Kullanıcının aktiflik durumu başarıyla değiştirildi."
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Kullanıcının kimliği doğrulanamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Bu işlem için ADMIN yetkisi gereklidir.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Kullanıcı bulunamadı.",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Sunucu tarafında beklenmeyen bir hata oluştu.",
-                    content = @Content
-            )
+            @ApiResponse(responseCode = "200", description = "Kullanıcının aktiflik durumu başarıyla değiştirildi."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Kullanıcı bulunamadı.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Sunucu tarafında beklenmeyen bir hata oluştu.", content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{uuid}/status")
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserProfileResponse> changeUserStatus(
-            @Parameter(
-                    description = "Aktiflik durumu değiştirilecek kullanıcının UUID'si",
-                    required = true
-            )
-            @PathVariable(name = "uuid") UUID uuid
+            @Parameter(description = "Aktiflik durumu değiştirilecek kullanıcının UUID'si", required = true)
+            @PathVariable UUID uuid
     ) {
-        return ResponseEntity.ok(
-                userService.changeUserStatus(uuid)
-        );
+        return ResponseEntity.ok(userService.changeUserStatus(uuid));
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(
+            summary = "Kullanıcıları listele",
+            description = "Arama kriterine ve sayfalama parametrelerine göre kullanıcıları listeler."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Kullanıcı listesi başarıyla getirildi."),
+            @ApiResponse(responseCode = "401", description = "Kullanıcının kimliği doğrulanamadı.", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Bu işlem için ADMIN yetkisi gereklidir.", content = @Content)
+    })
     public Page<UserProfileResponse> getUsers(
+            @Parameter(description = "Kullanıcı bilgileri üzerinde aranacak metin")
             @RequestParam(required = false) String search,
-            Pageable pageable) {
 
+            @ParameterObject Pageable pageable
+    ) {
         return userService.getAllUsers(search, pageable);
     }
 }

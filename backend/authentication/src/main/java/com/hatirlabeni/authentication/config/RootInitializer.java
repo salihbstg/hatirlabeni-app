@@ -1,6 +1,6 @@
 package com.hatirlabeni.authentication.config;
 
-import com.hatirlabeni.authentication.dtos.CreateUserRequest;
+import com.hatirlabeni.authentication.dtos.user.CreateUserRequest;
 import com.hatirlabeni.authentication.entity.AuthUser;
 import com.hatirlabeni.authentication.enums.Role;
 import com.hatirlabeni.authentication.feign.UserServiceFeign;
@@ -24,24 +24,31 @@ public class RootInitializer implements CommandLineRunner {
 
     @Value("${app.root.username}")
     private String rootUsername;
+
     @Value("${app.root.password}")
     private String rootPassword;
+
     @Value("${app.root.email}")
     private String rootEmail;
 
     @Override
-    public void run(String... args){
+    public void run(String... args) {
 
+        // Root kullanıcı daha önce oluşturulmuşsa tekrar oluşturulmasını engeller.
         if (authUserRepository.existsByUsername(rootUsername)) {
             return;
         }
+
         UUID uuid = UUID.randomUUID();
+
         AuthUser rootUser = new AuthUser();
         rootUser.setUuid(uuid);
         rootUser.setUsername(rootUsername);
         rootUser.setPassword(passwordEncoder.encode(rootPassword));
         rootUser.setEmail(rootEmail);
         rootUser.setRole(Role.ROOT);
+
+        // Root kullanıcının User Service tarafındaki profil bilgilerini hazırlar.
         CreateUserRequest createUserRequest = new CreateUserRequest(
                 uuid,
                 "Root",
@@ -50,13 +57,17 @@ public class RootInitializer implements CommandLineRunner {
                 "05000000000",
                 LocalDate.of(2026, 1, 1)
         );
+
+        // Auth Service'e kaydetmeden önce User Service tarafında kullanıcıyı oluşturur.
         createUserWithRetry(createUserRequest);
+
         authUserRepository.save(rootUser);
     }
 
     private void createUserWithRetry(CreateUserRequest createUserRequest) {
         int maxAttempts = 5;
 
+        // User Service çağrısı başarısız olursa en fazla 5 kez yeniden dener.
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
                 System.out.println(
@@ -77,6 +88,7 @@ public class RootInitializer implements CommandLineRunner {
 
                 e.printStackTrace();
 
+                // Tüm denemeler başarısız olursa uygulama başlangıcını hatayla sonlandırır.
                 if (attempt == maxAttempts) {
                     throw new IllegalStateException(
                             "Root user could not be created in user-service.",
@@ -85,6 +97,7 @@ public class RootInitializer implements CommandLineRunner {
                 }
 
                 try {
+                    // Sonraki denemeden önce 5 saniye bekler.
                     Thread.sleep(5000);
                 } catch (InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();

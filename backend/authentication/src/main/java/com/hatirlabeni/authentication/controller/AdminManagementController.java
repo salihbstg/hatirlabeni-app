@@ -23,21 +23,21 @@ import java.util.UUID;
 @RequestMapping("/api/v1/admins")
 @Tag(
         name = "Admin Management",
-        description = "ROOT yetkisiyle kullanıcıların ADMIN rolü yönetimi"
+        description = "ROOT yetkisine sahip kullanıcıların ADMIN rolünü yönetmesini sağlayan endpoint'ler."
 )
 public class AdminManagementController {
 
     private final AuthService authService;
 
     @Operation(
-            summary = "Kullanıcıyı admin yap",
-            description = "UUID bilgisi verilen kullanıcıya ADMIN rolü verir. " +
+            summary = "Kullanıcıya ADMIN rolü ver",
+            description = "Belirtilen UUID'ye sahip kullanıcının rolünü ADMIN olarak günceller. " +
                     "Bu işlem yalnızca ROOT yetkisine sahip kullanıcılar tarafından gerçekleştirilebilir."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Kullanıcı başarıyla ADMIN yapıldı."
+                    description = "Kullanıcının rolü başarıyla ADMIN olarak güncellendi."
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -49,7 +49,7 @@ public class AdminManagementController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Kullanıcı bulunamadı."
+                    description = "Belirtilen UUID'ye sahip kullanıcı bulunamadı."
             )
     })
     @PostMapping("/{uuid}")
@@ -57,7 +57,7 @@ public class AdminManagementController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> makeAdminByUUID(
             @Parameter(
-                    description = "ADMIN yapılacak kullanıcının UUID'si",
+                    description = "ADMIN rolü verilecek kullanıcının UUID'si.",
                     required = true
             )
             @PathVariable UUID uuid
@@ -68,14 +68,14 @@ public class AdminManagementController {
     }
 
     @Operation(
-            summary = "Admin yetkisini kaldır",
-            description = "UUID bilgisi verilen kullanıcının ADMIN rolünü kaldırarak USER rolüne dönüştürür. " +
+            summary = "Kullanıcının ADMIN rolünü kaldır",
+            description = "Belirtilen UUID'ye sahip kullanıcının ADMIN rolünü kaldırarak USER rolüne dönüştürür. " +
                     "Bu işlem yalnızca ROOT yetkisine sahip kullanıcılar tarafından gerçekleştirilebilir."
     )
     @ApiResponses({
             @ApiResponse(
                     responseCode = "204",
-                    description = "Kullanıcının ADMIN yetkisi başarıyla kaldırıldı."
+                    description = "Kullanıcının ADMIN rolü başarıyla kaldırıldı."
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -87,7 +87,7 @@ public class AdminManagementController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Kullanıcı bulunamadı."
+                    description = "Belirtilen UUID'ye sahip kullanıcı bulunamadı."
             )
     })
     @DeleteMapping("/{uuid}")
@@ -95,7 +95,7 @@ public class AdminManagementController {
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> deleteAdminByUUID(
             @Parameter(
-                    description = "ADMIN yetkisi kaldırılacak kullanıcının UUID'si",
+                    description = "ADMIN rolü kaldırılacak kullanıcının UUID'si.",
                     required = true
             )
             @PathVariable UUID uuid
