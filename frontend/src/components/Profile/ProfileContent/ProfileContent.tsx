@@ -31,17 +31,32 @@ const ProfileContent = ({
   return (
     <section
       aria-label="Profil içeriği"
-      className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[#e8e0d2] bg-[#fffdf8] shadow-[0_6px_24px_rgba(63,52,35,0.04)] md:h-[calc(100vh-140px)]"
+      className="
+        flex
+        min-h-0
+        min-w-0
+        flex-1
+        flex-col
+        overflow-hidden
+        rounded-2xl
+        border
+        border-[#e8e0d2]
+        bg-[#fffdf8]
+        shadow-[0_6px_24px_rgba(63,52,35,0.04)]
+        md:h-[calc(100vh-140px)]
+      "
     >
       <ProfileContentHeader
         title={title}
         description={description}
       />
 
-      <ProfileContentBody
-        activeMenu={activeMenu}
-        profile={profile}
-      />
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+        <ProfileContentBody
+          activeMenu={activeMenu}
+          profile={profile}
+        />
+      </div>
 
       <ProfileContentFooter />
     </section>
