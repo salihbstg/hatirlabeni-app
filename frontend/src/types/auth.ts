@@ -27,6 +27,7 @@ export type RegisterResponse = {
     active: boolean;
     createdAt: string;
     updatedAt: string;
+    mailActivation: boolean;
   };
 };
 
@@ -39,6 +40,7 @@ type User = {
   telephone: string;
   birthday: string;
   active: boolean;
+  mailActivation: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -55,34 +57,44 @@ export type MeResponse = {
   auth: Auth;
 };
 
-export type LoginRequest={
-  identifier:string,
-  password:string
-}
+export type LoginRequest = {
+  identifier: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  accessToken: string;
+  tokenType: string;
+};
+
+export type RefreshResponse = {
+  accessToken: string;
+  tokenType: string;
+};
 
 export type ForgotPasswordRequest = {
-  identifier: String;
+  identifier: string;
 };
 
 export type ResetPasswordRequest = {
-  token: String,
-  newPassword: String
+  token: string;
+  newPassword: string;
 };
 
-export type VerifyMailRequest={
-  token:String
-}
+export type VerifyMailRequest = {
+  token: string;
+};
 
-export type ChangePasswordRequest={
-  currentPassword:String,
-  newPassword:String
-}
+export type ChangePasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+};
 
-export type ChangeEmailRequest ={
+export type ChangeEmailRequest = {
   newEmail: string;
   password: string;
-}
+};
 
-export type VerifyChangeEmailRequest ={
+export type VerifyChangeEmailRequest = {
   token: string;
-}
+};

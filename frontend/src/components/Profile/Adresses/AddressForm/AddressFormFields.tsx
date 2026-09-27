@@ -1,5 +1,3 @@
-import React from "react";
-
 import locations from "../../../../data/Locations";
 
 import {
@@ -27,10 +25,8 @@ interface AddressFormFieldsProps {
   neighborhood: string;
   postalCode: string;
   addressLine: string;
-
   errors: FormErrors;
   isSubmitted: boolean;
-
   onTitleChange: (value: string) => void;
   onCityChange: (value: string) => void;
   onDistrictChange: (value: string) => void;
@@ -39,7 +35,7 @@ interface AddressFormFieldsProps {
   onAddressLineChange: (value: string) => void;
 }
 
-const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
+const AddressFormFields = ({
   title,
   city,
   district,
@@ -54,23 +50,25 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
   onNeighborhoodChange,
   onPostalCodeChange,
   onAddressLineChange,
-}) => {
-  // Seçilen şehre ait ilçeler
+}: AddressFormFieldsProps) => {
+  // Seçilen şehre ait ilçe bilgileri
   const selectedCity = locations[city as keyof typeof locations];
 
   const districts = selectedCity
     ? Object.keys(selectedCity.ilceler)
     : [];
 
-  // Seçilen ilçeye ait mahalleler
-  const neighborhoods =
+  // Seçilen ilçeye ait mahalle bilgileri
+  const neighborhoods: string[] =
     selectedCity?.ilceler[
       district as keyof typeof selectedCity.ilceler
     ] ?? [];
 
   // Hata durumuna göre input stillerini belirle
   const getInputClassName = (field: AddressField) =>
-    `${inputClassName} ${errors[field] ? errorInputClassName : ""}`;
+    `${inputClassName} ${
+      errors[field] ? errorInputClassName : ""
+    }`;
 
   // Alan altındaki hata mesajı
   const renderError = (field: AddressField) => {
@@ -87,7 +85,10 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
     <div className="space-y-3.5">
       {/* Adres Başlığı */}
       <div>
-        <label htmlFor="address-title" className={labelClassName}>
+        <label
+          htmlFor="address-title"
+          className={labelClassName}
+        >
           Adres Başlığı
         </label>
 
@@ -96,7 +97,9 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
           data-field="title"
           type="text"
           value={title}
-          onChange={(event) => onTitleChange(event.target.value)}
+          onChange={(event) =>
+            onTitleChange(event.target.value)
+          }
           placeholder="Örn. Ev, İş"
           className={`mt-1 ${getInputClassName("title")}`}
           aria-invalid={!!errors.title}
@@ -109,7 +112,10 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
       <div className={formGridClassName}>
         {/* İl */}
         <div>
-          <label htmlFor="address-city" className={labelClassName}>
+          <label
+            htmlFor="address-city"
+            className={labelClassName}
+          >
             İl
           </label>
 
@@ -117,7 +123,9 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
             id="address-city"
             data-field="city"
             value={city}
-            onChange={(event) => onCityChange(event.target.value)}
+            onChange={(event) =>
+              onCityChange(event.target.value)
+            }
             className={`mt-1 ${getInputClassName("city")}`}
             aria-invalid={!!errors.city}
           >
@@ -135,7 +143,10 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
 
         {/* İlçe */}
         <div>
-          <label htmlFor="address-district" className={labelClassName}>
+          <label
+            htmlFor="address-district"
+            className={labelClassName}
+          >
             İlçe
           </label>
 
@@ -143,7 +154,9 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
             id="address-district"
             data-field="district"
             value={district}
-            onChange={(event) => onDistrictChange(event.target.value)}
+            onChange={(event) =>
+              onDistrictChange(event.target.value)
+            }
             disabled={!city}
             className={`mt-1 ${getInputClassName("district")}`}
             aria-invalid={!!errors.district}
@@ -151,7 +164,10 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
             <option value="">İlçe seçiniz</option>
 
             {districts.map((districtName) => (
-              <option key={districtName} value={districtName}>
+              <option
+                key={districtName}
+                value={districtName}
+              >
                 {districtName}
               </option>
             ))}
@@ -180,13 +196,18 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
               onNeighborhoodChange(event.target.value)
             }
             disabled={!district}
-            className={`mt-1 ${getInputClassName("neighborhood")}`}
+            className={`mt-1 ${getInputClassName(
+              "neighborhood"
+            )}`}
             aria-invalid={!!errors.neighborhood}
           >
             <option value="">Mahalle seçiniz</option>
 
             {neighborhoods.map((neighborhoodName) => (
-              <option key={neighborhoodName} value={neighborhoodName}>
+              <option
+                key={neighborhoodName}
+                value={neighborhoodName}
+              >
                 {neighborhoodName}
               </option>
             ))}
@@ -219,7 +240,9 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
             className={`mt-1 ${getInputClassName("postalCode")}`}
             aria-invalid={!!errors.postalCode}
             aria-describedby={
-              errors.postalCode ? "postal-code-error" : undefined
+              errors.postalCode
+                ? "postal-code-error"
+                : undefined
             }
           />
 
@@ -245,7 +268,10 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
 
       {/* Açık Adres */}
       <div>
-        <label htmlFor="address-line" className={labelClassName}>
+        <label
+          htmlFor="address-line"
+          className={labelClassName}
+        >
           Açık Adres
         </label>
 
@@ -253,10 +279,14 @@ const AddressFormFields: React.FC<AddressFormFieldsProps> = ({
           id="address-line"
           data-field="addressLine"
           value={addressLine}
-          onChange={(event) => onAddressLineChange(event.target.value)}
+          onChange={(event) =>
+            onAddressLineChange(event.target.value)
+          }
           placeholder="Sokak, bina no, daire no vb."
           rows={3}
-          className={`mt-1 resize-y ${getInputClassName("addressLine")}`}
+          className={`mt-1 resize-y ${getInputClassName(
+            "addressLine"
+          )}`}
           aria-invalid={!!errors.addressLine}
         />
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -20,7 +19,7 @@ const ChangeEmailSection = () => {
    * Hata durumunda backend yanıtına göre kullanıcıyı bilgilendirir.
    */
   const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>,
+    event: React.SubmitEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
 

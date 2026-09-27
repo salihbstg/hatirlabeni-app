@@ -1,4 +1,4 @@
-import { useContext, useState, type ChangeEvent, type FormEvent } from "react";
+import { useContext, useState, type ChangeEvent} from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -43,7 +43,7 @@ const LoginForm = () => {
   };
 
   // Kullanıcı giriş işlemini gerçekleştirir.
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Aynı anda birden fazla giriş isteği gönderilmesini engeller.

@@ -3,7 +3,7 @@ interface ChangeEmailFormProps {
   currentPassword: string;
   onNewEmailChange: (value: string) => void;
   onCurrentPasswordChange: (value: string) => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: (event: React.SubmitEvent<HTMLFormElement>) => void;
 }
 
 const ChangeEmailForm = ({

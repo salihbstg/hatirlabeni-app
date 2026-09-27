@@ -1,11 +1,9 @@
 import { sendMailActivationLink } from "../../../api/AuthService";
-
-import type { MeResponse } from "../../../types/auth";
-
+import type { User } from "../../../types/User";
 import toast from "react-hot-toast";
 
 interface PersonalInformationProps {
-  user: MeResponse;
+  user: User;
 }
 
 const PersonalInformation = ({ user }: PersonalInformationProps) => {

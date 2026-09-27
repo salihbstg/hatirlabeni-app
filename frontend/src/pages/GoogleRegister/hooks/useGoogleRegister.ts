@@ -189,7 +189,7 @@ const useGoogleRegister = () => {
         } catch (error: unknown) {
             console.error("Google kayıt hatası:", error);
 
-            let message =
+            let message :string=
                 GOOGLE_REGISTER_MESSAGES.registrationError;
 
             if (axios.isAxiosError<ApiErrorResponse>(error)) {

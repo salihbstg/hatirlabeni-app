@@ -1,11 +1,17 @@
-import React from "react";
 import PersonalInformation from "./PersonalInformation";
 import AccountInformation from "./AccountInformation";
-const ProfileDetails = ({profile}) => {
+
+import type { MeResponse } from "../../../types/auth";
+
+interface ProfileDetailsProps {
+  profile: MeResponse;
+}
+
+const ProfileDetails = ({ profile }: ProfileDetailsProps) => {
   return (
     <div>
-      <PersonalInformation user={profile.user}></PersonalInformation>
-      <AccountInformation auth={profile.auth}></AccountInformation>
+      <PersonalInformation user={profile.user} />
+      <AccountInformation auth={profile.auth} />
     </div>
   );
 };

@@ -1,5 +1,3 @@
-import React from "react";
-
 import type { Address } from "../../../../types/User";
 import locations from "../../../../data/Locations";
 
@@ -28,12 +26,12 @@ const AddressCardFields = ({
   // Seçili şehrin ilçelerini getir
   const selectedCity = locations[address.city as keyof typeof locations];
 
-  const districts = selectedCity
+  const districts:string[] = selectedCity
     ? Object.keys(selectedCity.ilceler)
     : [];
 
   // Seçili ilçenin mahallelerini getir
-  const neighborhoods =
+  const neighborhoods:string[]=
     selectedCity?.ilceler[
       address.district as keyof typeof selectedCity.ilceler
     ] ?? [];

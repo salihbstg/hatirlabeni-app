@@ -1,5 +1,3 @@
-import React from "react";
-
 const ChangePasswordInfo = () => {
   return (
     <div className="space-y-2">

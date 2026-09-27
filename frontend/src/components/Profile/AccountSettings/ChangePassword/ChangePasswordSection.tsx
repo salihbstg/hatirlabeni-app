@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState} from "react";
 import toast from "react-hot-toast";
 
 import { changePassword } from "../../../../api/AuthService";
@@ -16,7 +16,7 @@ const ChangePasswordSection = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Şifre değiştirme işlemi
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     // Yeni şifrelerin eşleşmesini kontrol et

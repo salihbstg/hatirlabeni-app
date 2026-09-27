@@ -1,7 +1,5 @@
-import React from "react";
 
-import type { Address } from "../../../types/User";
-
+import type { Address } from "../../../../types/User";
 import AddressCardFields from "./AddressCardFields";
 
 interface AddressCardContentProps {

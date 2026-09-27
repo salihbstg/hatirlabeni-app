@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from "react";
+import type { ChangeEvent} from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -23,7 +23,7 @@ interface GoogleRegisterFormProps {
     loading: boolean;
     errorMessage: string;
     handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
-    handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
+    handleSubmit: (event: React.SubmitEvent<HTMLFormElement>) => void;
 }
 
 const GoogleRegisterForm = ({
