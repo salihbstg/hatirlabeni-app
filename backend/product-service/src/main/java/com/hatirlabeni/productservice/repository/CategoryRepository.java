@@ -16,7 +16,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findByParentUuidIsNotNull();
 
-    Category findByCategoryUuid(UUID uuid);
+    Optional<Category> findByCategoryUuid(UUID uuid);
 
     boolean existsByCategoryNameAndParentUuid(String categoryName, UUID uuid);
 }

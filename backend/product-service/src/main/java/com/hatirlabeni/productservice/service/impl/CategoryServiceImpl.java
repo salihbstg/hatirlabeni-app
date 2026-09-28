@@ -2,8 +2,11 @@ package com.hatirlabeni.productservice.service.impl;
 
 import com.hatirlabeni.productservice.dtos.category.CategoryResponse;
 import com.hatirlabeni.productservice.dtos.category.CreateCategoryRequest;
+import com.hatirlabeni.productservice.dtos.category.UpdateCategoryRequest;
 import com.hatirlabeni.productservice.entity.Category;
 import com.hatirlabeni.productservice.exception.category.CategoryConflictException;
+import com.hatirlabeni.productservice.exception.category.CategoryNotFoundException;
+import com.hatirlabeni.productservice.exception.category.ParentCategoryNotAllowedException;
 import com.hatirlabeni.productservice.mapper.CategoryMapper;
 import com.hatirlabeni.productservice.repository.CategoryRepository;
 import com.hatirlabeni.productservice.service.CategoryService;
@@ -30,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
 
             if (category.getParentUuid() != null) {
                 Category parentCategory =
-                        categoryRepository.findByCategoryUuid(category.getParentUuid());
+                        categoryRepository.findByCategoryUuid(category.getParentUuid()).orElseThrow(CategoryNotFoundException::new);
 
                 parentName = parentCategory.getCategoryName();
             }
@@ -82,4 +85,27 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> categoryList = categoryRepository.findByParentUuidIsNotNull();
         return toCategoryResponseList(categoryList);
     }
+
+    @Override
+    public CategoryResponse updateCategory(UUID categoryUuid, UpdateCategoryRequest updateCategoryRequest) {
+        Category category=categoryRepository.findByCategoryUuid(categoryUuid).orElseThrow(CategoryNotFoundException::new);
+        if(updateCategoryRequest.categoryName()!=null) {
+            category.setCategoryName(updateCategoryRequest.categoryName());
+        }
+        if(updateCategoryRequest.parentUuid()!=null) {
+            if(category.getParentUuid()==null) {
+                throw new ParentCategoryNotAllowedException("Ana kategoriler farklı bir kategorinin altında bulunamaz.");
+            }
+            category.setParentUuid(updateCategoryRequest.parentUuid());
+        }
+
+        return categoryMapper.toResponse(categoryRepository.save(category));
+    }
+
+    @Override
+    public void deleteCategory(UUID categoryUuid) {
+        Category category=categoryRepository.findByCategoryUuid(categoryUuid).orElseThrow(CategoryNotFoundException::new);
+        //Herhangi bir ürüne bağlı değilse silinecek.
+    }
+
 }

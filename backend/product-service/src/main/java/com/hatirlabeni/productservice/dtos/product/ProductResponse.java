@@ -11,6 +11,8 @@ public record ProductResponse(
         BigDecimal productPrice,
         Integer stockQuantity,
         UUID productCategoryUuid,
+        Double averageRating,
+        Long reviewCount,
         Boolean isActive,
         LocalDateTime createdAt,
         LocalDateTime updatedAt

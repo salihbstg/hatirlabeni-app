@@ -1,5 +1,6 @@
 package com.hatirlabeni.productservice.entity;
 
+import com.hatirlabeni.productservice.enums.Era;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +43,13 @@ public class Product {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Era productEra;
+
+    private Double averageRating;
+    private Long reviewCount;
+
     private Boolean isActive;
 
     @PrePersist
@@ -49,6 +57,9 @@ public class Product {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.isActive = true;
+        this.productUuid = UUID.randomUUID();
+        this.reviewCount = 0L;
+        this.averageRating = 0.0;
     }
     @PreUpdate
     protected void onUpdate() {

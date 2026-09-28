@@ -2,6 +2,7 @@ package com.hatirlabeni.productservice.service;
 
 import com.hatirlabeni.productservice.dtos.category.CategoryResponse;
 import com.hatirlabeni.productservice.dtos.category.CreateCategoryRequest;
+import com.hatirlabeni.productservice.dtos.category.UpdateCategoryRequest;
 import jakarta.validation.Valid;
 import org.jspecify.annotations.Nullable;
 
@@ -18,4 +19,9 @@ public interface CategoryService {
     List<CategoryResponse> getChildrenCategories();
 
     List<CategoryResponse> gelAllCategories();
+
+    CategoryResponse updateCategory(UUID categoryUuid, UpdateCategoryRequest updateCategoryRequest);
+
+    void deleteCategory(UUID categoryUuid);
+
 }

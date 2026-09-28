@@ -2,6 +2,7 @@ package com.hatirlabeni.productservice.controller;
 
 import com.hatirlabeni.productservice.dtos.category.CategoryResponse;
 import com.hatirlabeni.productservice.dtos.category.CreateCategoryRequest;
+import com.hatirlabeni.productservice.dtos.category.UpdateCategoryRequest;
 import com.hatirlabeni.productservice.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,16 @@ public class CategoryController {
     @GetMapping("/children")
     public ResponseEntity<List<CategoryResponse>> getChildrenCategories(){
         return ResponseEntity.ok(categoryService.getChildrenCategories());
+    }
+
+    @PatchMapping("/{categoryUuid}")
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable(name = "categoryUuid") UUID categoryUuid,@RequestBody UpdateCategoryRequest updateCategoryRequest){
+        return ResponseEntity.ok(categoryService.updateCategory(categoryUuid,updateCategoryRequest));
+    }
+
+    @DeleteMapping("/{categoryUuid}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable(name = "categoryUuid") UUID categoryUuid){
+        categoryService.deleteCategory(categoryUuid);
+        return ResponseEntity.noContent().build();
     }
 }

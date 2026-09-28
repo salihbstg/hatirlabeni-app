@@ -27,7 +27,7 @@ public class Category {
     @Column(nullable = false, unique = true)
     private UUID categoryUuid;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String categoryName;
 
     private UUID parentUuid;
