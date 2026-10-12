@@ -1,0 +1,62 @@
+services:
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hatirlabeni_auth
+    volumes:
+      - ./init-db:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data
+
+
+  authentication:
+    image: hatirlabeni-authentication
+    ports:
+      - "8082:8082"
+    environment:
+      AUTH_DB_URL: jdbc:postgresql://postgres:5432/hatirlabeni_auth
+      user-service.url: http://user-service:8081/api/v1/users
+
+
+  user-service:
+    image: hatirlabeni-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      USER_DB_URL: jdbc:postgresql://postgres:5432/hatirlabeni_users
+      auth-service.url: http://authentication:8082/api/v1/auth
+
+  api-gateway:
+    image: hatirlabeni-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_0_ID: user-service
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_0_URI: http://user-service:8081
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_0_PREDICATES_0: Path=/api/v1/users/**
+
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_1_ID: authentication-service
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_1_URI: http://authentication:8082
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_1_PREDICATES_0: Path=/api/v1/auth/**
+
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_2_ID: address-service
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_2_URI: http://user-service:8081
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_2_PREDICATES_0: Path=/api/v1/address/**
+
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_3_ID: oauth2-authorization
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_3_URI: http://authentication:8082
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_3_PREDICATES_0: Path=/oauth2/**
+
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_4_ID: oauth2-callback
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_4_URI: http://authentication:8082
+      SPRING_CLOUD_GATEWAY_SERVER_WEBMVC_ROUTES_4_PREDICATES_0: Path=/login/oauth2/**
+
+  frontend:
+    image: hatirlabeni-frontend
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres-data:

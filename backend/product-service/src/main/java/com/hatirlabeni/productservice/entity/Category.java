@@ -13,24 +13,22 @@ import java.util.UUID;
         name = "categories",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_category_name_parent",
-                        columnNames = {"category_name", "parent_uuid"}
+                        name = "uk_category_name_group",
+                        columnNames = {"category_name", "category_group_id"}
                 )
         }
 )
 public class Category {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false, unique = true)
     private UUID categoryUuid;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String categoryName;
 
-    private UUID parentUuid;
+    @Column(nullable = false)
+    private Long categoryGroupId;
 
     @PrePersist
     protected void onCreate() {

@@ -1,9 +1,6 @@
 package com.hatirlabeni.productservice.exception;
 
-import com.hatirlabeni.productservice.exception.category.CategoryConflictException;
-import com.hatirlabeni.productservice.exception.category.CategoryNotFoundException;
-import com.hatirlabeni.productservice.exception.category.EraCategoryNotFoundException;
-import com.hatirlabeni.productservice.exception.category.ParentCategoryNotAllowedException;
+import com.hatirlabeni.productservice.exception.category.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,12 +37,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(EraCategoryNotFoundException.class)
-    ResponseEntity<ErrorResponse> eraCategoryNotFoundExceptionHandler(
-            EraCategoryNotFoundException ex
-    ) {
-        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
+
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     ResponseEntity<ErrorResponse> dataIntegrityViolationExceptionHandler(
@@ -55,6 +47,13 @@ public class GlobalExceptionHandler {
                 "Veri bütünlüğü ihlal edildi. Gönderilen veri mevcut kayıtlarla çakışıyor veya geçersiz.",
                 HttpStatus.CONFLICT
         );
+    }
+
+    @ExceptionHandler(ParentCategoryNotFoundException.class)
+    ResponseEntity<ErrorResponse> parentCategoryNotFoundExceptionHandler(
+            ParentCategoryNotFoundException ex
+    ){
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
